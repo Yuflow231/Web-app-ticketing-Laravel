@@ -1,0 +1,47 @@
+.toast-group {
+  position: fixed;
+  z-index: 1000;
+  inset-inline: 0;
+  padding-top: calc( var(--top-nav-height) + var(--spacing-sm) );
+
+  display: grid;
+  justify-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+
+  /* prevent toasts to block user interactions */
+  pointer-events: none;
+}
+
+.toast {
+  font-family: var(--font-family), sans-serif;
+  color: var(--text-white);
+  background: var(--danger-color);
+  
+  max-inline-size: 50ch; /*50 unit relative to font-size & font-family*/
+  padding: .5ch 1ch;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-lg);
+
+  will-change: transform;
+  animation: 
+    fade-in .3s ease,
+    slide-in .3s ease,
+    fade-out .3s ease var(--toast-duration); /* 3rd parameter add delay */
+}
+
+.toast[data-type="neutral"] {background-color: #3498DB;}
+.toast[data-type="error"] {background-color: #F31212}
+.toast[data-type="success"] {background-color: #27AE60;}
+
+@keyframes fade-in {
+  from { opacity: 0 }
+}
+
+@keyframes fade-out {
+  to { opacity: 0 }
+}
+
+@keyframes slide-in {
+  from { transform: translateY(-10px) }
+}

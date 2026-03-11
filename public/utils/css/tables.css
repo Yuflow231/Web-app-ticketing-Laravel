@@ -1,0 +1,151 @@
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: var(--secondary-color);
+}
+
+th {
+    text-align: left;
+    padding: var(--spacing-md);
+    font-weight: 600;
+    color: var(--text-white);
+    border-bottom: 2px solid #dee2e6;
+}
+
+tr {
+    border-bottom: 2px solid var(--bg-main);
+}
+
+tr:last-child{
+    border-bottom: none;
+}
+
+tr:hover {
+    background: rgba(0, 10, 40, 0.05);
+}
+
+td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid #dee2e6;
+}
+
+table a{
+    color: var(--primary-color);
+}
+
+table a:hover{
+    color: var(--primary-hover);
+}
+
+.avatar-line{
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.profile-pic-mini {
+    width: 25px;
+    height: 25px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--primary-color);
+    object-fit: cover;
+}
+
+
+.table-btns {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+}
+
+.table-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+.filter {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.filter label {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter input,
+.filter select {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--bg-main);
+    border-radius: var(--radius-sm);
+}
+
+/* Responsive */
+@media only screen and (max-width: 768px) {
+    /* Stack table elements */
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    .table-card{
+        background-color: var(--bg-main);
+    }
+    /* Hide the original header row */
+    thead tr {
+        display: none;
+    }
+
+    tr {
+        border-bottom: var(--spacing-xs) solid var(--secondary-color);
+        border-top: var(--spacing-xs) solid var(--secondary-color);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        background: var(--bg-card);
+        box-shadow: var(--shadow-sm);
+    }
+
+    tr:hover {
+        background: var(--bg-card); /* hide hover for mobile */
+    }
+
+    tr:last-child {
+        border-bottom: var(--spacing-xs) solid var(--secondary-color);
+    }
+
+    td {
+        border: none;
+        position: relative;
+        padding-left: 40% !important;
+        border-bottom: 2px solid var(--bg-main);
+        justify-content: flex-end;
+        align-items: center;
+        font-size: var(--font-size-base);
+    }
+
+    td:last-child {
+        border-bottom: 0;
+    }
+
+    /* Make the labels smaller and more subtle */
+    td::before {
+        position: absolute;
+        left: 0.75rem;
+        width: 35%;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        content: attr(data-label);
+        color: var(--text-secondary); /* Greyer color for labels to make data pop */
+        font-size: var(--font-size-sm);
+        text-transform: uppercase;
+    }
+}
