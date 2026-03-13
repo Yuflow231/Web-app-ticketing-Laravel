@@ -22,7 +22,7 @@ function laink($route): void {
             <span>| Ticketing App</span>
         </div>
         <div class="user-profile-header">
-            <a href="#" class="user-profile-inline">
+            <a href="{{ route("profile") }}" class="user-profile-inline">
                 <span class="username" data-type="first-name"> {{ auth()->user()->first_name }} </span>
                 <span class="username" data-type="last-name"> {{ auth()->user()->last_name }} </span>
 

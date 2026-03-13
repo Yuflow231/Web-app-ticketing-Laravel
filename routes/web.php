@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Routes publiques
+| Public routes
 |--------------------------------------------------------------------------
 */
 
@@ -26,7 +26,7 @@ Route::get('/reset-password', [AccountController::class, 'password'])->name('res
 
 /*
 |--------------------------------------------------------------------------
-| Routes authentifiées
+| Authentified routes
 |--------------------------------------------------------------------------
 */
 
@@ -42,23 +42,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [AccountController::class, 'profile'])->name('profile');
     Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile-update');
 
-    // Mot de passe
+    // Password
     Route::put('/reset-password', [AccountController::class, 'updatePassword'])->name('password-update');
 
-    // Projets - Routes personnalisées
+    // Projects - Routes
     Route::get('/project', [ProjectsController::class, 'index'])->name('projects.projects');
     Route::get('/project-creation', [ProjectsController::class, 'creation'])->name('projects.project-creation');
-    Route::get('/project-details', [ProjectsController::class, 'details'])->name('projects.project-details');
+    Route::get('/project-details/{id}', [ProjectsController::class, 'details'])->name('projects.project-details');
 
-    // Projets - Routes ressources
+    // Projects - Routes resources
     Route::resource('projects', ProjectsController::class);
 
-    // Tickets - Routes personnalisées
+    // Tickets - Routes
     Route::get('/ticket', [TicketsController::class, 'index'])->name('tickets.tickets');
     Route::get('/ticket-creation', [TicketsController::class, 'creation'])->name('tickets.ticket-creation');
-    Route::get('/ticket-details', [TicketsController::class, 'details'])->name('tickets.ticket-details');
+    Route::get('/ticket-details/{id}', [TicketsController::class, 'details'])->name('tickets.ticket-details');
 
-    // Tickets - Routes ressources
+    // Tickets - Routes resources
     Route::resource('tickets', TicketsController::class);
     Route::delete('/attachments/{attachment}', [TicketsController::class, 'deleteAttachment'])
         ->name('attachments.destroy');

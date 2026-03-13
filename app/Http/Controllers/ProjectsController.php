@@ -85,22 +85,11 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Show project details
+     * Show project details from an id
      */
-    public function show(Project $project)
+    public function details(int $id)
     {
-        $project->load(['teamMembers', 'tickets.workers']);
-
-        return view('projects.project-details', compact('project'));
-    }
-
-    /**
-     * Alias for show (route /project-details)
-     * Show the first project or redirect toward the list if non found
-     */
-    public function details()
-    {
-        $project = Project::with(['teamMembers', 'tickets.workers'])->first();
+        $project = Project::with(['teamMembers', 'tickets.workers'])->find($id);
 
         if (!$project) {
             return redirect()->route('projects.index')

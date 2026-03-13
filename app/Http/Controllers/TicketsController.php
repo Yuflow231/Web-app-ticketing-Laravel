@@ -97,22 +97,11 @@ class TicketsController extends Controller
     }
 
     /**
-     * Show ticket details
+     * Show ticket details from an id
      */
-    public function show(Ticket $ticket)
+    public function details(int $id)
     {
-        $ticket->load(['project', 'workers', 'attachments']);
-
-        return view('tickets.ticket-details', compact('ticket'));
-    }
-
-    /**
-     * Alias for show (for route /ticket-details)
-     * show the first ticket or toward the list if no ticket
-     */
-    public function details()
-    {
-        $ticket = Ticket::with(['project', 'workers', 'attachments'])->first();
+        $ticket = Ticket::with(['project', 'workers', 'attachments'])->find($id);
 
         if (!$ticket) {
             return redirect()->route('tickets.index')

@@ -90,7 +90,7 @@
                             <td data-label="Creation date">{{ optional($project->created_at)->format('Y-m-d') }}</td>
                             <td data-label="Actions">
                                 <div style="display: flex; justify-content: space-evenly">
-                                    <a href="{{ route('projects.project-details') }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="{{ route('projects.project-details', $project->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                     <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;"> <i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </td>
@@ -120,7 +120,7 @@
                         <td data-label="Creation date">1996-02-02</td>
                         <td data-label="Actions">
                             <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route('projects.project-details') }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                <a href="{{ route('projects.project-details', 1) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;"> <i class="fa-solid fa-trash"></i></button>
                             </div>
                         </td>

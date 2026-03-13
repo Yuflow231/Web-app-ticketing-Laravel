@@ -103,7 +103,7 @@
                         </td>
                         <td data-label="Actions">
                             <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                <a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
 
                                 <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
                                     <i class="fa-solid fa-trash"></i>
@@ -126,7 +126,7 @@
                         </td>
                         <td data-label="Actions">
                             <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                <a href="{{ route("tickets.ticket-details", 1) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
 
                                 <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
                                     <i class="fa-solid fa-trash"></i>
