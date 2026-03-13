@@ -20,10 +20,9 @@ Route::get('/login', [AccountController::class, 'showLogin'])->name('login');
 Route::post('/login', [AccountController::class, 'login']);
 
 Route::get('/register', [AccountController::class, 'showRegister'])->name('register');
-Route::post('/register', [AccountController::class, 'register']);
+Route::post('/register', [AccountController::class, 'register'])->name('registering');
 
-Route::get('/create-account', [AccountController::class, 'create'])->name('create-account');
-Route::post('/create-account', [AccountController::class, 'register']);
+Route::get('/reset-password', [AccountController::class, 'password'])->name('reset-password');
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +32,7 @@ Route::post('/create-account', [AccountController::class, 'register']);
 
 Route::middleware('auth')->group(function () {
 
-    // Déconnexion
+    // Log out
     Route::post('/logout', [AccountController::class, 'logout'])->name('logout');
 
     // Dashboard
@@ -44,7 +43,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile-update');
 
     // Mot de passe
-    Route::get('/reset-password', [AccountController::class, 'password'])->name('reset-password');
     Route::put('/reset-password', [AccountController::class, 'updatePassword'])->name('password-update');
 
     // Projets - Routes personnalisées

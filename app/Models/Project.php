@@ -43,7 +43,7 @@ class Project extends Model
     }
 
     /**
-     * Relation: Tickets du projet
+     * Relation: Tickets of the project
      */
     public function tickets()
     {
@@ -51,7 +51,7 @@ class Project extends Model
     }
 
     /**
-     * Relation: Membres de l'équipe du projet
+     * Relation: Member of the team's project
      */
     public function teamMembers()
     {
@@ -61,9 +61,9 @@ class Project extends Model
     }
 
     /**
-     * Relation: Propriétaires du projet
+     * Relation: Owner of the project
      */
-    public function owners()
+    public function owner()
     {
         return $this->belongsToMany(User::class, 'project_team')
                     ->wherePivot('role', 'Owner')
@@ -71,7 +71,7 @@ class Project extends Model
     }
 
     /**
-     * Relation: Mainteneurs du projet
+     * Relation: Maintainers of the project
      */
     public function maintainers()
     {
@@ -81,7 +81,7 @@ class Project extends Model
     }
 
     /**
-     * Calculer le temps total passé sur tous les tickets
+     * Calculate the total time spent throughout all the tickets
      */
     public function calculateSpentTime()
     {
@@ -90,7 +90,7 @@ class Project extends Model
     }
 
     /**
-     * Scope pour les projets actifs
+     * Scope for active projects
      */
     public function scopeActive($query)
     {
@@ -98,7 +98,7 @@ class Project extends Model
     }
 
     /**
-     * Scope pour les projets complétés
+     * Scope for completed projects
      */
     public function scopeCompleted($query)
     {

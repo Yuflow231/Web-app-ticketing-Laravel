@@ -6,6 +6,7 @@
 
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
+    @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
 @endsection
 
 @section('content')
@@ -64,34 +65,38 @@
                     <tbody>
                     <!-- Projects will be loaded here -->
                     <!-- Project template -->
-                    <tr>
-                        <td data-label="ID">#1</td>
-                        <td data-label="Project name"><strong>Skyblocker</strong></td>
-                        <td data-label="Client">
-                            <div class="user-profile-inline">
-                                <img src="{{ asset("assets/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
-                                <span style="margin-left: var(--spacing-sm)">VicIsACat</span>
-                            </div>
-                        </td>
-                        <td data-label="Status">
-                            <span class="badge green">In Progress</span>
-                        </td>
-                        <td data-label="Progress">
-                            <div class="progress-container">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 3%;"></div>
+                    @foreach($projects->items() as $project)
+                        @php $owner = $project->owner->first(); @endphp
+                        <tr>
+                            <td data-label="ID">#{{ $project->id }}</td>
+                            <td data-label="Project name"><strong>{{ $project->name }}</strong></td>
+                            <td data-label="Client">
+                                <div class="user-profile-inline">
+                                    <img src="{{ !empty($owner->profile_pic) ? asset('assets/images/'.$owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
+                                    <span style="margin-left: var(--spacing-sm)">{{ $owner->first_name.' '.$owner->last_name}}</span>
                                 </div>
-                                <div class="progress-percentage">3%</div>
-                            </div>
-                        </td>
-                        <td data-label="Creation date">1996-02-02</td>
-                        <td data-label="Actions">
-                            <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route('projects.project-details') }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;"> <i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                            <td data-label="Status">
+                                <span class="badge @php setBadgeColor($project->status) @endphp">{{ $project->status }}</span>
+                            </td>
+                            <td data-label="Progress">
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ $project->progress_percent }}%;"></div>
+                                    </div>
+                                    <div class="progress-percentage">{{ $project->progress_percent }}%</div>
+                                </div>
+                            </td>
+                            <td data-label="Creation date">{{ optional($project->created_at)->format('Y-m-d') }}</td>
+                            <td data-label="Actions">
+                                <div style="display: flex; justify-content: space-evenly">
+                                    <a href="{{ route('projects.project-details') }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;"> <i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+
                     <tr>
                         <td data-label="ID">#2</td>
                         <td data-label="Project name"><strong>Skyblocker</strong></td>

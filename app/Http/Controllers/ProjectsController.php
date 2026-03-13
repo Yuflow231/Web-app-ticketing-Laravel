@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Storage;
 class ProjectsController extends Controller
 {
     /**
-     * Afficher la liste des projets
+     * Show project list
      */
     public function index()
     {
-        $projects = Project::with(['teamMembers', 'tickets'])
+        $projects = Project::with(['teamMembers', 'tickets', 'owner'])
             ->latest()
             ->paginate(15);
 
@@ -23,7 +23,7 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Afficher le formulaire de création
+     * Show project creation form
      */
     public function create()
     {
@@ -32,7 +32,7 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Alias pour create (pour la route /project-creation)
+     * Alias for create (route /project-creation)
      */
     public function creation()
     {
@@ -40,7 +40,7 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Créer un nouveau projet
+     * Create a project
      */
     public function store(Request $request)
     {
@@ -55,7 +55,7 @@ class ProjectsController extends Controller
             'team_roles' => 'nullable|array',
         ]);
 
-        // Gérer l'upload du contrat
+        // Handle contract upload
         if ($request->hasFile('contract')) {
             $contractPath = $request->file('contract')->store('contracts', 'public');
             $validated['contract'] = $contractPath;
@@ -67,7 +67,7 @@ class ProjectsController extends Controller
 
         $project = Project::create($validated);
 
-        // Attacher les membres de l'équipe
+        // Attach the team member
         if ($request->has('team_members')) {
             foreach ($request->team_members as $index => $userId) {
                 $role = $request->team_roles[$index] ?? 'Maintainer';
@@ -75,17 +75,17 @@ class ProjectsController extends Controller
             }
         }
 
-        // Ajouter le créateur comme Owner s'il n'est pas déjà dans l'équipe
+        // Add the creator as "Owner" if not already in the team
         if (!$project->teamMembers->contains(Auth::id())) {
             $project->teamMembers()->attach(Auth::id(), ['role' => 'Owner']);
         }
 
         return redirect()->route('projects.show', $project)
-            ->with('success', 'Projet créé avec succès');
+            ->with('success', 'Project created successfully.');
     }
 
     /**
-     * Afficher les détails d'un projet
+     * Show project details
      */
     public function show(Project $project)
     {
@@ -95,8 +95,8 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Alias pour show (pour la route /project-details)
-     * Affiche le premier projet ou redirige vers la liste si aucun projet
+     * Alias for show (route /project-details)
+     * Show the first project or redirect toward the list if non found
      */
     public function details()
     {
@@ -104,14 +104,14 @@ class ProjectsController extends Controller
 
         if (!$project) {
             return redirect()->route('projects.index')
-                ->with('info', 'Aucun projet disponible. Créez-en un nouveau.');
+                ->with('info', 'No project available.');
         }
 
         return view('projects.project-details', compact('project'));
     }
 
     /**
-     * Afficher le formulaire d'édition
+     * Show project edition form
      */
     public function edit(Project $project)
     {
@@ -122,7 +122,7 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Mettre à jour un projet
+     * Update a project
      */
     public function update(Request $request, Project $project)
     {
@@ -138,9 +138,9 @@ class ProjectsController extends Controller
             'team_roles' => 'nullable|array',
         ]);
 
-        // Gérer l'upload du contrat
+        // Handle contract upload
         if ($request->hasFile('contract')) {
-            // Supprimer l'ancien contrat
+            // Delete old contract
             if ($project->contract) {
                 Storage::disk('public')->delete($project->contract);
             }
@@ -148,14 +148,14 @@ class ProjectsController extends Controller
             $validated['contract'] = $contractPath;
         }
 
-        // Si le projet est fermé, ajouter la date de clôture
+        // If project is closed, add closing date
         if ($validated['status'] === 'Closed' && !$project->closing_date) {
             $validated['closing_date'] = now();
         }
 
         $project->update($validated);
 
-        // Mettre à jour les membres de l'équipe
+        // Update team members
         if ($request->has('team_members')) {
             $syncData = [];
             foreach ($request->team_members as $index => $userId) {
@@ -166,15 +166,15 @@ class ProjectsController extends Controller
         }
 
         return redirect()->route('projects.show', $project)
-            ->with('success', 'Projet mis à jour avec succès');
+            ->with('success', 'Project updated successfully.');
     }
 
     /**
-     * Supprimer un projet
+     * Delete a project
      */
     public function destroy(Project $project)
     {
-        // Supprimer le contrat s'il existe
+        // Delete the contract if it exists
         if ($project->contract) {
             Storage::disk('public')->delete($project->contract);
         }
@@ -182,6 +182,6 @@ class ProjectsController extends Controller
         $project->delete();
 
         return redirect()->route('projects.index')
-            ->with('success', 'Projet supprimé avec succès');
+            ->with('success', 'Project deleted successfully.');
     }
 }

@@ -16,7 +16,7 @@ class DashController extends Controller
     {
         $user = Auth::user();
 
-        // Statistiques générales
+        // Global stats
         $stats = [
             'total_projects' => Project::count(),
             'active_projects' => Project::active()->count(),
@@ -24,13 +24,13 @@ class DashController extends Controller
             'active_tickets' => Ticket::active()->count(),
         ];
 
-        // Projets récents
-        $recentProjects = Project::with('teamMembers')
+        // Recent projects
+        $recentProjects = Project::with('teamMembers', 'tickets')
             ->latest()
             ->take(5)
             ->get();
 
-        // Tickets récents
+        // Recent tickets
         $recentTickets = Ticket::with(['project', 'workers'])
             ->latest()
             ->take(10)

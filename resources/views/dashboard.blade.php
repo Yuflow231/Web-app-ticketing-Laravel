@@ -6,6 +6,7 @@
 
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
+    @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
 @endsection
 
 @section('content')
@@ -58,8 +59,8 @@
                 @foreach($recentProjects as $project)
                     <div class="card flex-column">
                         <h3>{{ $project->name }}</h3>
-                        <p>Tickets: 2 </p>
-                        <p>Status:  <span class="badge green"> {{ $project->status }} </span></p>
+                        <p>Tickets: {{ $project->tickets->count() }} </p>
+                        <p>Status:  <span class="badge @php setBadgeColor($project->status) @endphp"> {{ $project->status }} </span></p>
                     </div>
                 @endforeach
             </div>
@@ -89,8 +90,8 @@
                         <td data-label="ID">{{$ticket->id}}</td>
                         <td data-label="Title"><strong>{{$ticket->name}}</strong></td>
                         <td data-label="Project">{{$ticket->project->name}}</td>
-                        <td data-label="Status"><span class="badge green">{{$ticket->status}}</span></td>
-                        <td data-label="Priority"><span class="badge orange">{{$ticket->priority}}</span></td>
+                        <td data-label="Status"><span class="badge @php setBadgeColor($ticket->status) @endphp">{{$ticket->status}}</span></td>
+                        <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{$ticket->priority}}</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
                                 @foreach($ticket->workers as $worker)

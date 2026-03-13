@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class TicketsController extends Controller
 {
     /**
-     * Afficher la liste des tickets
+     * Show the ticket list
      */
     public function index()
     {
@@ -25,7 +25,7 @@ class TicketsController extends Controller
     }
 
     /**
-     * Afficher le formulaire de création
+     * Show the creation from
      */
     public function create()
     {
@@ -36,7 +36,7 @@ class TicketsController extends Controller
     }
 
     /**
-     * Alias pour create (pour la route /ticket-creation)
+     * Alias for create (route /ticket-creation)
      */
     public function creation()
     {
@@ -44,7 +44,7 @@ class TicketsController extends Controller
     }
 
     /**
-     * Créer un nouveau ticket
+     * Create a ticket
      */
     public function store(Request $request)
     {
@@ -66,7 +66,7 @@ class TicketsController extends Controller
 
         $ticket = Ticket::create($validated);
 
-        // Attacher les travailleurs
+        // Assign the ticket workers
         if ($request->has('workers')) {
             foreach ($request->workers as $index => $userId) {
                 $role = $request->worker_roles[$index] ?? '';
@@ -74,12 +74,12 @@ class TicketsController extends Controller
             }
         }
 
-        // Ajouter le créateur comme "Ticket Creator" s'il n'est pas déjà dans les workers
+        // Add the creator as the "Ticket Creator" if not already a worker
         if (!$ticket->workers->contains(Auth::id())) {
             $ticket->workers()->attach(Auth::id(), ['role' => 'Ticket Creator']);
         }
 
-        // Gérer les pièces jointes
+        // Handle attachments
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -93,11 +93,11 @@ class TicketsController extends Controller
         }
 
         return redirect()->route('tickets.show', $ticket)
-            ->with('success', 'Ticket créé avec succès');
+            ->with('success', 'Ticket created successfully.');
     }
 
     /**
-     * Afficher les détails d'un ticket
+     * Show ticket details
      */
     public function show(Ticket $ticket)
     {
@@ -107,8 +107,8 @@ class TicketsController extends Controller
     }
 
     /**
-     * Alias pour show (pour la route /ticket-details)
-     * Affiche le premier ticket ou redirige vers la liste si aucun ticket
+     * Alias for show (for route /ticket-details)
+     * show the first ticket or toward the list if no ticket
      */
     public function details()
     {
@@ -116,14 +116,14 @@ class TicketsController extends Controller
 
         if (!$ticket) {
             return redirect()->route('tickets.index')
-                ->with('info', 'Aucun ticket disponible. Créez-en un nouveau.');
+                ->with('info', 'No ticket available.');
         }
 
         return view('tickets.ticket-details', compact('ticket'));
     }
 
     /**
-     * Afficher le formulaire d'édition
+     * Show the edit form
      */
     public function edit(Ticket $ticket)
     {
@@ -135,7 +135,7 @@ class TicketsController extends Controller
     }
 
     /**
-     * Mettre à jour un ticket
+     * Update the ticket
      */
     public function update(Request $request, Ticket $ticket)
     {
@@ -156,7 +156,7 @@ class TicketsController extends Controller
 
         $ticket->update($validated);
 
-        // Mettre à jour les travailleurs
+        // Update the workers
         if ($request->has('workers')) {
             $syncData = [];
             foreach ($request->workers as $index => $userId) {
@@ -166,7 +166,7 @@ class TicketsController extends Controller
             $ticket->workers()->sync($syncData);
         }
 
-        // Gérer les nouvelles pièces jointes
+        // Handle the new attachments
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -180,11 +180,11 @@ class TicketsController extends Controller
         }
 
         return redirect()->route('tickets.show', $ticket)
-            ->with('success', 'Ticket mis à jour avec succès');
+            ->with('success', 'Ticket updated successfully.');
     }
 
     /**
-     * Supprimer un ticket
+     * Delete a ticket
      */
     public function destroy(Ticket $ticket)
     {
@@ -197,17 +197,17 @@ class TicketsController extends Controller
         $ticket->delete();
 
         return redirect()->route('tickets.index')
-            ->with('success', 'Ticket supprimé avec succès');
+            ->with('success', 'Ticket deleted successfully.');
     }
 
     /**
-     * Supprimer une pièce jointe
+     * Delete an attachment
      */
     public function deleteAttachment(TicketAttachment $attachment)
     {
         Storage::disk('public')->delete('attachments/' . $attachment->file_name);
         $attachment->delete();
 
-        return back()->with('success', 'Pièce jointe supprimée avec succès');
+        return back()->with('success', 'Attachment deleted successfully.');
     }
 }

@@ -39,7 +39,7 @@ class Ticket extends Model
     }
 
     /**
-     * Relation: Projet auquel appartient le ticket
+     * Relation: Project chich the ticket belongs to
      */
     public function project()
     {
@@ -47,7 +47,7 @@ class Ticket extends Model
     }
 
     /**
-     * Relation: Utilisateurs qui travaillent sur le ticket
+     * Relation: Users working on the ticket
      */
     public function workers()
     {
@@ -57,7 +57,7 @@ class Ticket extends Model
     }
 
     /**
-     * Relation: Créateur du ticket
+     * Relation: Ticket creator
      */
     public function creator()
     {
@@ -78,7 +78,7 @@ class Ticket extends Model
     }
 
     /**
-     * Relation: Pièces jointes
+     * Relation: Attachments
      */
     public function attachments()
     {
@@ -86,7 +86,7 @@ class Ticket extends Model
     }
 
     /**
-     * Scope pour les tickets par priorité
+     * Scope tickets by priority
      */
     public function scopeByPriority($query, $priority)
     {
@@ -94,7 +94,7 @@ class Ticket extends Model
     }
 
     /**
-     * Scope pour les tickets actifs
+     * Scope ticket if active
      */
     public function scopeActive($query)
     {
@@ -102,7 +102,7 @@ class Ticket extends Model
     }
 
     /**
-     * Scope pour les tickets complétés
+     * Scope completed tickets
      */
     public function scopeCompleted($query)
     {
@@ -110,7 +110,7 @@ class Ticket extends Model
     }
 
     /**
-     * Scope pour les tickets facturés
+     * Scope billed tickets
      */
     public function scopeBilled($query)
     {
@@ -118,7 +118,7 @@ class Ticket extends Model
     }
 
     /**
-     * Mettre à jour le temps passé du projet parent
+     * Update the spent time on parent project
      */
     protected static function booted()
     {

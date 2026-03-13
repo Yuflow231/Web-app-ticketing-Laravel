@@ -49,7 +49,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Override pour utiliser password_hashed au lieu de password
+     * Override to use password_hashed instead of password
      */
     public function getAuthPassword()
     {
@@ -57,7 +57,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation: Projects où l'utilisateur est membre
+     * Relation: Projects where the user is a member of
      */
     public function projects()
     {
@@ -67,7 +67,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation: Tickets où l'utilisateur travaille
+     * Relation: Tickets where the user os assigned to
      */
     public function tickets()
     {
@@ -77,7 +77,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Vérifier si l'utilisateur est administrateur
+     * Check if the user is an admin
      */
     public function isAdmin(): bool
     {
@@ -85,7 +85,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Obtenir le nom complet
+     * Get the full name
      */
     public function getFullNameAttribute(): string
     {

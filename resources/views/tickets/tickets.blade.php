@@ -6,10 +6,12 @@
 
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
+    @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
 @endsection
 
 @section('content')
     @include('layout.nav')
+
     <!-- Main Content -->
     <main class="main-content">
         <header class="page-header">
@@ -84,16 +86,19 @@
                     <tbody>
                     <!-- Tickets will be loaded here -->
                     <!-- Ticket template -->
+                    @foreach($tickets->items() as $ticket)
                     <tr>
-                        <td data-label="ID">#1</td>
-                        <td data-label="Title"><strong> Customizable UI bars</strong></td>
-                        <td data-label="Project">Skyblocker</td>
-                        <td data-label="Status"><span class="badge green">In Progress</span></td>
-                        <td data-label="Priority"><span class="badge orange">Medium</span></td>
-                        <td data-label="Type"><span class="badge green">Included</span></td>
+                        <td data-label="ID">#{{ $ticket->id }}</td>
+                        <td data-label="Title" class="title-cell"><strong>{{ $ticket->name }}</strong></td>
+                        <td data-label="Project">{{$ticket->project->name}}</td>
+                        <td data-label="Status"><span class="badge @php setBadgeColor($ticket->status) @endphp">{{ $ticket->status }}</span></td>
+                        <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{ $ticket->priority }}</span></td>
+                        <td data-label="Type"><span class="badge @php setBadgeColor($ticket->type) @endphp">{{ $ticket->type }}</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                <img src="{{ asset("utils/images/icon.png") }}" title="Vic IsACat" alt="profile_pic" class="profile-pic-mini">
+                                @foreach($ticket->workers as $worker)
+                                    <img src="{{ !empty($worker->profile_pic) ? asset('assets/images/'.$worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->first_name. ' ' .$worker->last_name }}" alt="profile-picture" class="profile-pic-mini">
+                                @endforeach
                             </div>
                         </td>
                         <td data-label="Actions">
@@ -106,6 +111,7 @@
                             </div>
                         </td>
                     </tr>
+                    @endforeach
                     <tr>
                         <td data-label="ID">#3</td>
                         <td data-label="Title"><strong>Implement Dark Mode</strong></td>

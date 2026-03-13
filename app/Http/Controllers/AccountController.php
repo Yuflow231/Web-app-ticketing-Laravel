@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 class AccountController extends Controller
 {
     /**
-     * Afficher le formulaire de connexion
+     * Show login form
      */
     public function showLogin()
     {
@@ -18,7 +18,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Traiter la connexion
+     * Handle login
      */
     public function login(Request $request)
     {
@@ -27,10 +27,10 @@ class AccountController extends Controller
             'password' => 'required',
         ]);
 
-        // Chercher l'utilisateur par email
+        // Get the user by email
         $user = User::where('email', $credentials['email'])->first();
 
-        // Vérifier le mot de passe
+        // Verify password
         if ($user && Hash::check($credentials['password'], $user->password_hashed)) {
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
@@ -39,12 +39,12 @@ class AccountController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Les identifiants fournis ne correspondent pas à nos enregistrements.',
+            'email' => 'The login details aren t valid.',
         ])->onlyInput('email');
     }
 
     /**
-     * Déconnexion
+     * Log out
      */
     public function logout(Request $request)
     {
@@ -56,7 +56,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Afficher le formulaire de création de compte
+     * Show account creation form
      */
     public function showRegister()
     {
@@ -64,7 +64,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Alias pour showRegister (pour la route /create-account)
+     * Alias for showRegister (route /create-account)
      */
     public function create()
     {
@@ -72,7 +72,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Créer un nouveau compte
+     * Create a new account
      */
     public function register(Request $request)
     {
@@ -96,7 +96,7 @@ class AccountController extends Controller
 
         Auth::login($user);
 
-        return redirect('/dashboard');
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -110,7 +110,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Alias pour showProfile (pour la route /profile)
+     * Alias for showProfile (route /profile)
      */
     public function profile()
     {
@@ -118,7 +118,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Mettre à jour le profil
+     * Update the profile
      */
     public function updateProfile(Request $request)
     {
@@ -139,11 +139,11 @@ class AccountController extends Controller
 
         $user->update($validated);
 
-        return back()->with('success', 'Profil mis à jour avec succès');
+        return back()->with('success', 'Profile updated successfully');
     }
 
     /**
-     * Afficher le formulaire de réinitialisation de mot de passe
+     * Show the reset password form
      */
     public function showResetPassword()
     {
@@ -151,7 +151,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Alias pour showResetPassword (pour la route /reset-password)
+     * Alias for showResetPassword (route /reset-password)
      */
     public function password()
     {
@@ -159,7 +159,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Mettre à jour le mot de passe
+     * Update password
      */
     public function updatePassword(Request $request)
     {
@@ -171,13 +171,13 @@ class AccountController extends Controller
         $user = Auth::user();
 
         if (!Hash::check($validated['current_password'], $user->password_hashed)) {
-            return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect']);
+            return back()->withErrors(['current_password' => 'Incorrect password']);
         }
 
         $user->update([
             'password_hashed' => Hash::make($validated['password'])
         ]);
 
-        return back()->with('success', 'Mot de passe mis à jour avec succès');
+        return back()->with('success', 'Password updated successfully');
     }
 }

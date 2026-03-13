@@ -20,7 +20,7 @@ class TicketAttachment extends Model
     ];
 
     /**
-     * Relation: Ticket auquel appartient la pièce jointe
+     * Relation: Ticket which belong to the attachment
      */
     public function ticket()
     {
@@ -28,7 +28,7 @@ class TicketAttachment extends Model
     }
 
     /**
-     * Obtenir le chemin complet du fichier
+     * Get the whole file path
      */
     public function getFilePathAttribute(): string
     {
@@ -36,7 +36,7 @@ class TicketAttachment extends Model
     }
 
     /**
-     * Obtenir l'URL publique du fichier
+     * Get the public file path
      */
     public function getFileUrlAttribute(): string
     {

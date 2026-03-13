@@ -1,4 +1,4 @@
-<?php
+@php
 /**
  * Helper function to generate navigation links with proper active state and debug param
  * @param string $refLink The target URL
@@ -12,7 +12,7 @@ function laink($route): void {
     $refLink = route($route);
     echo "<a href='{$refLink}'{$activeClass}>";
 }
-?>
+@endphp
 
 
 <nav class="navigation">
@@ -35,30 +35,30 @@ function laink($route): void {
     <!-- Side Navigation Bar -->
     <div class="side-nav">
         <div class="top-side">
-            <?php laink('dashboard')?>
+            @php laink('dashboard')@endphp
             <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
             <span class="text">Dashboard</span>
             </a>
-            <?php laink('projects.projects')?>
+            @php laink('projects.projects') @endphp
             <span class="icon"><i class="fa-solid fa-diagram-project"></i></span>
             <span class="text">Projects</span>
             </a>
-            <?php laink('tickets.tickets')?>
+            @php laink('tickets.tickets')@endphp
             <span class="icon"><i class="fa-solid fa-ticket"></i></span>
             <span class="text">Tickets</span>
             </a>
-            <?php laink('profile')?>
+            @php laink('profile')@endphp
             <span class="icon"><i class="fa-solid fa-user"></i></span>
             <span class="text">Profile</span>
             </a>
         </div>
 
         <form id="logout" method="post" action="{{ route("logout") }}">
-            @csrf
+        @csrf
             <a href="javascript:{}" onclick="document.getElementById('logout').submit();">
                 <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
                 <span class="text">Logout</span>
             </a>
         </form>
-    </div>
+</div>
 </nav>

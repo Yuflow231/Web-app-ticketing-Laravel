@@ -37,7 +37,7 @@
                     </div>
                     <div class="detail-item">
                         <label>Member Since</label>
-                        <p>{{ auth()->user()->created_at }}</p>
+                        <p>{{ optional(auth()->user()->created_at)->format("Y-m-d") }}</p>
                     </div>
                     <div>
                         <button type="button" class="btn">Edit</button>
@@ -54,10 +54,6 @@
                             <option value="en" selected>English</option>
                             <option value="fr">French</option>
                         </select>
-                    </div>
-                    <div class="form-item-stacked">
-                        <label for="debug">Debug mode</label>
-                        <input type="checkbox" id="debug">
                     </div>
                 </section>
 

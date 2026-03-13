@@ -89,7 +89,7 @@
                 <button class="btn centered" id="actions" type="submit">
                     Login
                 </button>
-                <button onclick="location.href = '{{ route('create-account') }}'" class="btn centered btn--outline" type="button" style="margin-top: var(--spacing-md);">
+                <button onclick="location.href = '{{ route('register') }}'" class="btn centered btn--outline" type="button" style="margin-top: var(--spacing-md);">
                     Create account
                 </button>
             </div>
