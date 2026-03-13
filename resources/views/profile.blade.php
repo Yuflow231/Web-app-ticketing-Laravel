@@ -25,7 +25,7 @@
                     </div>
 
 
-                    <img src="{{ asset("utils/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
+                    <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
                 </header>
 
                 <div>

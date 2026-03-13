@@ -26,7 +26,7 @@
                     <label>Owner *</label>
                     <!-- Guest: locked to self -->
                     <div class="user-profile-inline" style="padding: var(--spacing-sm); border: 1px solid #ddd; border-radius: var(--radius-md); opacity: 0.8;">
-                        <img src="{{ asset("utils/images/yuflow.jpg") }}" class="profile-pic-mini" alt="profile-pic">
+                        <img src="{{ asset("assets/images/yuflow.jpg") }}" class="profile-pic-mini" alt="profile-pic">
                         <span style="margin-left: var(--spacing-sm)">Yuflow</span>
                         <span>Furry</span>
                     </div>

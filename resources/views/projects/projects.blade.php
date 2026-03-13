@@ -69,7 +69,7 @@
                         <td data-label="Project name"><strong>Skyblocker</strong></td>
                         <td data-label="Client">
                             <div class="user-profile-inline">
-                                <img src="{{ asset("utils/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
+                                <img src="{{ asset("assets/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
                                 <span style="margin-left: var(--spacing-sm)">VicIsACat</span>
                             </div>
                         </td>
@@ -97,7 +97,7 @@
                         <td data-label="Project name"><strong>Skyblocker</strong></td>
                         <td data-label="Client">
                             <div class="user-profile-inline">
-                                <img src="{{ asset("utils/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
+                                <img src="{{ asset("assets/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
                                 <span style="margin-left: var(--spacing-sm)">VicIsACat</span>
                             </div>
                         </td>

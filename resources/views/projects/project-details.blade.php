@@ -67,7 +67,7 @@
                     <h2>Project Team</h2>
                     <div id="collaborator-list">
                         <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
-                            <img src="{{ asset("utils/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
+                            <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
                             <div class="item-stacked" style="margin-left: var(--spacing-sm);">
                                 <div>
                                     <span class="username" data-type="first-name">Yuflow2</span>
@@ -77,7 +77,7 @@
                             </div>
                         </div>
                         <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
-                            <img src="{{ asset("utils/images/icon.png") }}" alt="User Profile" class="profile-pic" >
+                            <img src="{{ asset("assets/images/icon.png") }}" alt="User Profile" class="profile-pic" >
                             <div class="item-stacked" style="margin-left: var(--spacing-sm);">
                                 <div>
                                     <span class="username" data-type="first-name">Vic</span>
@@ -160,8 +160,20 @@
                 <h2>Files associated</h2>
                 <button class="btn" style="margin-bottom: var(--spacing-sm)">Edit documents</button>
                 <ul>
-                    <li>Business Contract</li>
-                    <li>User stories</li>
+                    <li>
+                        Visual Examples
+                        <div style="color: var(--primary-color);">
+                            <a href="{{ asset("assets/images/icon.png") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            <a href="{{ asset("assets/images/icon.png") }}" download="test_file_1" class="icon"><i class="fa-solid fa-download"></i></a>
+                        </div>
+                    </li>
+                    <li>
+                        Visual Examples
+                        <div style="color: var(--primary-color);">
+                            <a href="{{ asset("assets/images/img.png") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            <a href="{{ asset("assets/images/img.png") }}" download="test_file_2" class="icon"><i class="fa-solid fa-download"></i></a>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>

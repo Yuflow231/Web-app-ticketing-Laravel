@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--suppress HtmlRequiredTitleElement -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image" href="{{ asset("utils/images/icon.png") }}">
+    <link rel="icon" type="image" href="{{ asset("assets/images/icon.png") }}">
 
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/js/all.min.js"></script>

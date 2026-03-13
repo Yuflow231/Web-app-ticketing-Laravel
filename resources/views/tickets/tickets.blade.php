@@ -115,7 +115,7 @@
                         <td data-label="Type"><span class="badge red">Billed</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                <img src="{{ asset("utils/images/icon.png") }}" title="Vic IsACat" alt="profile_pic" class="profile-pic-mini">
+                                <img src="{{ asset("assets/images/icon.png") }}" title="Vic IsACat" alt="profile_pic" class="profile-pic-mini">
                             </div>
                         </td>
                         <td data-label="Actions">

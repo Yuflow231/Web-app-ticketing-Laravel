@@ -100,7 +100,7 @@
                         <td data-label="Priority"><span class="badge orange">Medium</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                <img src="{{ asset("utils/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
+                                <img src="{{ asset("assets/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
                             </div>
                         </td>
                         <td data-label="Actions"><a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
@@ -113,8 +113,8 @@
                         <td data-label="Priority"><span class="badge green">Low</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                <img src="{{ asset("utils/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
-                                <img src="{{ asset("utils/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
+                                <img src="{{ asset("assets/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
+                                <img src="{{ asset("assets/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
                             </div>
                         </td>
                         <td data-label="Actions"><a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
