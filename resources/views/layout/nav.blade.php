@@ -14,6 +14,7 @@ function laink($route): void {
 }
 ?>
 
+
 <nav class="navigation">
     <header class="top-bar">
         <div class="menu-bar">
@@ -22,10 +23,11 @@ function laink($route): void {
         </div>
         <div class="user-profile-header">
             <a href="#" class="user-profile-inline">
-                <span class="username" data-type="first-name">Yuflow</span>
-                <span class="username" data-type="last-name">Furry</span>
+                <span class="username" data-type="first-name"> {{ auth()->user()->first_name }} </span>
+                <span class="username" data-type="last-name"> {{ auth()->user()->last_name }} </span>
 
-                <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
+                <!-- <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" > -->
+                <img src="{{ !empty(auth()->user()->profile_pic) ? asset('assets/images/'.auth()->user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
             </a>
         </div>
     </header>
@@ -51,9 +53,12 @@ function laink($route): void {
             </a>
         </div>
 
-        <a href="{{ route('login') }}">
-            <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
-            <span class="text">Logout</span>
-        </a>
+        <form id="logout" method="post" action="{{ route("logout") }}">
+            @csrf
+            <a href="javascript:{}" onclick="document.getElementById('logout').submit();">
+                <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+                <span class="text">Logout</span>
+            </a>
+        </form>
     </div>
 </nav>

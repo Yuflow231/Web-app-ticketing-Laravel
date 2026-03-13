@@ -19,23 +19,25 @@
             <section class="detail-card">
                 <header class="profile-header">
                     <div class="name-group">
-                        <div class="username" data-type="first-name">Yuflow</div>
-                        <div class="username" data-type="last-name">Furry</div>
-                        <p class="user-role">Administrator</p>
+                        <div class="username" data-type="first-name">{{ auth()->user()->first_name }}</div>
+                        <div class="username" data-type="last-name">{{ auth()->user()->last_name }}</div>
+                        <p class="user-role">{{ auth()->user()->role }}</p>
                     </div>
 
 
-                    <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
+                    <!-- <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" > -->
+                    <img src="{{ !empty(auth()->user()->profile_pic) ? asset('assets/images/'.auth()->user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
+
                 </header>
 
                 <div>
                     <div class="detail-item">
                         <label>Email Address</label>
-                        <p>Yuflow@Yuflow.com</p>
+                        <p>{{ auth()->user()->email }}</p>
                     </div>
                     <div class="detail-item">
                         <label>Member Since</label>
-                        <p>2026-03-08</p>
+                        <p>{{ auth()->user()->created_at }}</p>
                     </div>
                     <div>
                         <button type="button" class="btn">Edit</button>

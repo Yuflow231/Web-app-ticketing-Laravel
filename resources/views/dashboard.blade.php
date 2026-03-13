@@ -15,7 +15,6 @@
         <header class="page-header">
             <h1>Dashboard</h1>
         </header>
-
         <!-- Statistics Section -->
         <section id="statistics">
             <h2>Statistics</h2>
@@ -23,29 +22,29 @@
                 <div class="stat-card">
                     <div class="icon"><i class="fa-solid fa-diagram-project"></i></div>
                     <div class="stat-details">
-                        <h3 id="stat-projects">0</h3>
-                        <p class="text">Active projects</p>
+                        <h3 id="stat-projects">{{ $stats["total_projects"] }}</h3>
+                        <p class="text">Totals projects</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="icon"><i class="fa-solid fa-ticket"></i></div>
                     <div class="stat-details">
-                        <h3 id="stat-tickets">0</h3>
+                        <h3 id="stat-tickets">{{ $stats["active_projects"] }}</h3>
                         <p class="text">Active Tickets</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="stat-details">
-                        <h3 id="stat-urgent">0</h3>
-                        <p class="text">Urgent Tickets</p>
+                        <h3 id="stat-urgent">{{ $stats["total_tickets"] }}</h3>
+                        <p class="text">Total Tickets</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="icon"><i class="fa-solid fa-circle-check"></i></div>
                     <div class="stat-details">
-                        <h3 id="stat-closed">0</h3>
-                        <p class="text">Closed Tickets</p>
+                        <h3 id="stat-closed">{{ $stats["active_tickets"] }}</h3>
+                        <p class="text">Active Tickets</p>
                     </div>
                 </div>
             </div>
@@ -56,21 +55,13 @@
             <h2>Recent projects</h2>
             <div class="grid-content" id="recent-projects">
                 <!-- Projects will be loaded here -->
-                <div class="card flex-column">
-                    <h3>Skyblocker</h3>
-                    <p>Tickets: 2</p>
-                    <p>Status:  <span class="badge green">In Progress</span></p>
-                </div>
-                <div class="card flex-column">
-                    <h3>Project B</h3>
-                    <p>Tickets: 8</p>
-                    <p>Status:  <span class="badge orange">On Hold</span></p>
-                </div>
-                <div class="card flex-column">
-                    <h3>Project C</h3>
-                    <p>Tickets: 1</p>
-                    <p>Status:  <span class="badge red">Closed</span></p>
-                </div>
+                @foreach($recentProjects as $project)
+                    <div class="card flex-column">
+                        <h3>{{ $project->name }}</h3>
+                        <p>Tickets: 2 </p>
+                        <p>Status:  <span class="badge green"> {{ $project->status }} </span></p>
+                    </div>
+                @endforeach
             </div>
         </section>
 
@@ -91,34 +82,25 @@
                     </tr>
                     </thead>
                     <tbody id="recent-tickets">
+
                     <!-- Tickets will be loaded here -->
+                    @foreach($recentTickets as $ticket)
                     <tr>
-                        <td data-label="ID">#101</td>
-                        <td data-label="Title"><strong>Customizable UI bars</strong></td>
-                        <td data-label="Project">Skyblocker</td>
-                        <td data-label="Status"><span class="badge green">In Progress</span></td>
-                        <td data-label="Priority"><span class="badge orange">Medium</span></td>
+                        <td data-label="ID">{{$ticket->id}}</td>
+                        <td data-label="Title"><strong>{{$ticket->name}}</strong></td>
+                        <td data-label="Project">{{$ticket->project->name}}</td>
+                        <td data-label="Status"><span class="badge green">{{$ticket->status}}</span></td>
+                        <td data-label="Priority"><span class="badge orange">{{$ticket->priority}}</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                <img src="{{ asset("assets/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
+                                @foreach($ticket->workers as $worker)
+                                    <img src="{{ !empty($worker->profile_pic) ? asset('assets/images/'.$worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->first_name. ' ' .$worker->last_name }}" alt="profile-picture" class="profile-pic-mini">
+                                @endforeach
                             </div>
                         </td>
                         <td data-label="Actions"><a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
                     </tr>
-                    <tr>
-                        <td data-label="ID">#105</td>
-                        <td data-label="Title"><strong>Implement Dark Mode</strong></td>
-                        <td data-label="Project">Skyblocker</td>
-                        <td data-label="Status"><span class="badge blue">New</span></td>
-                        <td data-label="Priority"><span class="badge green">Low</span></td>
-                        <td data-label="Assigned">
-                            <div class="avatar-line">
-                                <img src="{{ asset("assets/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
-                                <img src="{{ asset("assets/images/icon.png") }}" title="Unassigned" alt="profile-picture" class="profile-pic-mini">
-                            </div>
-                        </td>
-                        <td data-label="Actions"><a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
-                    </tr>
+                    @endforeach
                     </tbody>
                 </table>
             </div>
