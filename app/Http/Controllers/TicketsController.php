@@ -17,9 +17,17 @@ class TicketsController extends Controller
      */
     public function index()
     {
-        $tickets = Ticket::with(['project', 'workers'])
-            ->latest()
-            ->paginate(20);
+        $user = Auth::user();
+
+        $query = Ticket::with(['project', 'workers']);
+
+        if (!$user || !$user->isAdmin()) {
+            $query->whereHas('workers', function ($q) use ($user) {
+                $q->where('users.id', $user?->id);
+            });
+        }
+
+        $tickets = $query->latest()->paginate(15);
 
         return view('tickets.tickets', compact('tickets'));
     }
@@ -101,11 +109,20 @@ class TicketsController extends Controller
      */
     public function details(int $id)
     {
+        $user = Auth::user();
         $ticket = Ticket::with(['project', 'workers', 'attachments'])->find($id);
 
         if (!$ticket) {
             return redirect()->route('tickets.index')
-                ->with('info', 'No ticket available.');
+                ->with('info', 'Ticket not found or no longer exists.');
+        }
+
+        $isMember = $ticket->project->teamMembers()->where('users.id', $user->id)->exists();
+        $isAdmin = $user->isAdmin();
+
+        if (!$isMember && !$isAdmin) {
+            return redirect()->route('tickets.index')
+                ->with('info', 'Access denied.');
         }
 
         return view('tickets.ticket-details', compact('ticket'));

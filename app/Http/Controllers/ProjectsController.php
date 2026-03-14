@@ -15,9 +15,17 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        $projects = Project::with(['teamMembers', 'tickets', 'owner'])
-            ->latest()
-            ->paginate(15);
+        $user = Auth::user();
+
+        $query = Project::with(['teamMembers', 'tickets', 'owner']);
+
+        if (!$user || !$user->isAdmin()) {
+            $query->whereHas('teamMembers', function ($q) use ($user) {
+                $q->where('users.id', $user?->id);
+            });
+        }
+
+        $projects = $query->latest()->paginate(15);
 
         return view('projects.projects', compact('projects'));
     }
@@ -89,11 +97,20 @@ class ProjectsController extends Controller
      */
     public function details(int $id)
     {
-        $project = Project::with(['teamMembers', 'tickets.workers'])->find($id);
+        $user = Auth::user();
 
+        $project = Project::with(['teamMembers', 'tickets.workers'])->find($id);
         if (!$project) {
+            return redirect()->route('tickets.index')
+                ->with('info', 'Project not found or no longer exists.');
+        }
+
+        $isMember = $project->teamMembers()->where('users.id', $user->id)->exists();
+        $isAdmin = $user->isAdmin();
+
+        if ( !$isMember && !$isAdmin ) {
             return redirect()->route('projects.index')
-                ->with('info', 'No project available.');
+                ->with('info', 'Access denied.');
         }
 
         return view('projects.project-details', compact('project'));

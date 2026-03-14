@@ -62,7 +62,7 @@
                     <div class="detail-item">
                         <label>Password</label>
                         <p style="margin-bottom: 1rem;">••••••••••••</p>
-                        <a href="{{ route('reset-password') }}>" class="password" style="">Change Password</a>
+                        <a href="{{ route('reset-password') }}" class="password" style="">Change Password</a>
                     </div>
                 </section>
             </div>

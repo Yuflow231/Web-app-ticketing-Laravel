@@ -99,7 +99,7 @@
                                 @endforeach
                             </div>
                         </td>
-                        <td data-label="Actions"><a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                        <td data-label="Actions"><a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
                     </tr>
                     @endforeach
                     </tbody>
