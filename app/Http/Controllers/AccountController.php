@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AccountController extends Controller
 {
@@ -64,14 +66,6 @@ class AccountController extends Controller
     }
 
     /**
-     * Alias for showRegister (route /create-account)
-     */
-    public function create()
-    {
-        return $this->showRegister();
-    }
-
-    /**
      * Create a new account
      */
     public function register(Request $request)
@@ -100,21 +94,13 @@ class AccountController extends Controller
     }
 
     /**
-     * Afficher le profil
+     * Show profile page
      */
     public function showProfile()
     {
         return view('profile', [
             'user' => Auth::user()
         ]);
-    }
-
-    /**
-     * Alias for showProfile (route /profile)
-     */
-    public function profile()
-    {
-        return $this->showProfile();
     }
 
     /**
@@ -179,5 +165,69 @@ class AccountController extends Controller
         ]);
 
         return back()->with('success', 'Password updated successfully');
+    }
+
+    public function confirmDelete(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->input('password'), $user->password_hashed)) {
+            return back()->withErrors(['password' => 'Incorrect password']);
+        }
+
+        return $this->destroy($request);
+    }
+
+    /**
+     * Delete the authenticated user account
+     */
+    public function destroy(Request $request)
+    {
+        $user = Auth::user();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+
+        if (!empty($user->profile_pic) && Storage::disk('public')->exists($user->profile_pic)) {
+            Storage::disk('public')->delete($user->profile_pic);
+        }
+
+        // Get projects where this user is owner
+        $ownedProjects = $user->projects()->wherePivot('role', 'Owner')->get();
+
+        foreach ($ownedProjects as $ownedProject) {
+            // Get remaining members excluding the user being deleted
+            $remainingMembers = $ownedProject->teamMembers()
+                ->where('users.id', '!=', $user->id)
+                ->get();
+
+            if ($remainingMembers->isEmpty()) {
+                // No one left => delete the project and its contract
+                if (!empty($ownedProject->contract) && Storage::disk('public')->exists($ownedProject->contract)) {
+                    Storage::disk('public')->delete($ownedProject->contract);
+                }
+                $ownedProject->delete();
+            }else{
+                $firstMember = $remainingMembers->first();
+
+                // Detach deleted user first
+                $ownedProject->teamMembers()->detach($user->id);
+
+                // Promote new owner in pivot
+                $ownedProject->teamMembers()->updateExistingPivot($firstMember->id, [
+                    'role' => 'Owner',
+                ]);
+            }
+        }
+
+        $user->delete();
+
+        return redirect('/')->with('success', 'Your account has been deleted.');
     }
 }

@@ -39,27 +39,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashController::class, 'index'])->name('dashboard');
 
     // Profil
-    Route::get('/profile', [AccountController::class, 'profile'])->name('profile');
+    Route::get('/profile', [AccountController::class, 'showProfile'])->name('profile');
     Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile-update');
+    Route::delete('/profile', [AccountController::class, 'confirmDelete'])->name('profile-delete');
 
     // Password
     Route::put('/reset-password', [AccountController::class, 'updatePassword'])->name('password-update');
 
     // Projects - Routes
-    Route::get('/project', [ProjectsController::class, 'index'])->name('projects.projects');
-    Route::get('/project-creation', [ProjectsController::class, 'creation'])->name('projects.project-creation');
+    Route::get('/projects', [ProjectsController::class, 'index'])->name('projects.projects');
+    Route::get('/project-creation', [ProjectsController::class, 'showCreate'])->name('projects.project-creation');
     Route::get('/project-details/{id}', [ProjectsController::class, 'details'])->name('projects.project-details');
-
-    // Projects - Routes resources
-    Route::resource('projects', ProjectsController::class);
+    Route::post('/project-store', [ProjectsController::class, 'store'])->name('projects.project-store');
+    Route::delete('/project-destroy/{id}', [ProjectsController::class, 'destroy'])->name('projects.project-destroy');
 
     // Tickets - Routes
-    Route::get('/ticket', [TicketsController::class, 'index'])->name('tickets.tickets');
-    Route::get('/ticket-creation', [TicketsController::class, 'creation'])->name('tickets.ticket-creation');
+    Route::get('/tickets', [TicketsController::class, 'index'])->name('tickets.tickets');
+    Route::get('/ticket-creation', [TicketsController::class, 'showCreate'])->name('tickets.ticket-creation');
     Route::get('/ticket-details/{id}', [TicketsController::class, 'details'])->name('tickets.ticket-details');
+    Route::post('/ticket-store', [TicketsController::class, 'store'])->name('tickets.ticket-store');
+    Route::delete('/ticket-destroy/{id}', [TicketsController::class, 'destroy'])->name('tickets.ticket-destroy');
 
-    // Tickets - Routes resources
-    Route::resource('tickets', TicketsController::class);
-    Route::delete('/attachments/{attachment}', [TicketsController::class, 'deleteAttachment'])
-        ->name('attachments.destroy');
+    Route::delete('/attachments/{attachment}', [TicketsController::class, 'deleteAttachment'])->name('attachments.destroy');
 });

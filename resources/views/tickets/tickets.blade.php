@@ -106,39 +106,37 @@
                             <div style="display: flex; justify-content: space-evenly">
                                 <a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
 
-                                <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
+                                <button type="button" class="icon btn-delete-project"
+                                        data-ticket-id="{{ $ticket->id }}"
+                                        data-ticket-name="{{ $ticket->name }}"
+                                        style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </div>
                         </td>
                     </tr>
                     @endforeach
-                    <tr>
-                        <td data-label="ID">#3</td>
-                        <td data-label="Title" class="text-cell"><strong>Implement Dark Mode</strong></td>
-                        <td data-label="Project" class="text-cell">Skyblocker</td>
-                        <td data-label="Status"><span class="badge blue">New</span></td>
-                        <td data-label="Priority"><span class="badge green">Low</span></td>
-                        <td data-label="Type"><span class="badge red">Billed</span></td>
-                        <td data-label="Assigned">
-                            <div class="avatar-line">
-                                <img src="{{ asset("assets/images/icon.png") }}" title="Vic IsACat" alt="profile_pic" class="profile-pic-mini">
-                            </div>
-                        </td>
-                        <td data-label="Actions">
-                            <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route("tickets.ticket-details", 1) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
-                                <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
                     </tbody>
                 </table>
             </div>
         </section>
+
+        {{-- Delete ticket modal --}}
+        <dialog id="delete-modal" class="modal-container">
+            <h2>Delete ticket</h2>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+                You are about to delete <br> <strong id="modal-project-name"></strong> <br> This action is irreversible.
+            </p>
+
+            <form method="POST" action="#" id="delete-form">
+                @csrf
+                @method('DELETE')
+                <div class="inline-elements">
+                    <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
+                    <button type="submit" class="btn btn--danger">Confirm deletion</button>
+                </div>
+            </form>
+        </dialog>
 
         <footer class="page-footer">
             <div>
@@ -153,8 +151,18 @@
 @section('js_page')
     <script type="module">
         import { TableManager } from "{{ asset("utils/js/table-handler.js") }}";
-
-        // Initialize for tickets table
         new TableManager('#table', 5);
+
+        const modal     = document.getElementById('delete-modal');
+        const form      = document.getElementById('delete-form');
+        const modalName = document.getElementById('modal-project-name');
+
+        document.querySelectorAll('.btn-delete-project').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalName.textContent = btn.dataset.ticketName;
+                form.action = "{{ route('tickets.ticket-destroy', '__ID__') }}".replace('__ID__', btn.dataset.ticketId);
+                modal.showModal();
+            });
+        });
     </script>
 @endsection

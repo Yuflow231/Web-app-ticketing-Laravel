@@ -164,6 +164,14 @@ input[type="checkbox"]:checked {
     color: white;
 }
 
+.modal-container{
+    border-radius: var(--radius-md);
+    border: 1px solid #ddd;
+    padding: 2rem;
+    max-width: 400px;
+    margin: auto auto;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .file-item {

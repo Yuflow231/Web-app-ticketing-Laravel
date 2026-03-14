@@ -27,7 +27,7 @@
             </div>
         @endif
 
-        <form id="project-form" class="form-box" method="POST" action="{{ route('projects.store') }}" enctype="multipart/form-data">
+        <form id="project-form" class="form-box" method="POST" action="{{ route('projects.project-store') }}" enctype="multipart/form-data">
             @csrf
             <div class="form-2elements">
                 <div class="form-item-stacked">

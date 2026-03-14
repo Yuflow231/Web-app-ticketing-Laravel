@@ -140,15 +140,6 @@
                                 <td data-label="Action"><a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
                             </tr>
                         @endforeach
-
-                        <tr>
-                            <td data-label="ID">#3</td>
-                            <td data-label="Title" class="text-cell"><strong>Implement Dark Mode</strong></td>
-                            <td data-label="Status"><span class="badge blue">New</span></td>
-                            <td data-label="Priority"><span class="badge green">Low</span></td>
-                            <td data-label="Type"><span class="badge red">Billed</span></td>
-                            <td data-label="Action"><a href="{{ route("tickets.ticket-details", 1) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
-                        </tr>
                         </tbody>
                     </table>
                 </div>

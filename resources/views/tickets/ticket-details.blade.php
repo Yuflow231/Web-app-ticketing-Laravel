@@ -84,17 +84,6 @@
                                 </div>
                             </div>
                         @endforeach
-
-                        <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
-                            <img src="{{ asset("assets/images/icon.png") }}" alt="User Profile" class="profile-pic" >
-                            <div class="item-stacked" style="margin-left: var(--spacing-sm);">
-                                <div>
-                                    <span class="username" data-type="first-name">Vic</span>
-                                    <span class="username" data-type="last-name">IsACat</span>
-                                </div>
-                                <span class="user-role">Helper</span>
-                            </div>
-                        </div>
                     </div>
                 </section>
             </div>

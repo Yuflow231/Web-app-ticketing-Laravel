@@ -35,20 +35,11 @@ class ProjectsController extends Controller
     /**
      * Show project creation form
      */
-    public function create()
+    public function showCreate()
     {
         $users = User::all();
         return view('projects.project-creation', compact('users'));
     }
-
-    /**
-     * Alias for create (route /project-creation)
-     */
-    public function creation()
-    {
-        return $this->create();
-    }
-
     /**
      * Create a project
      */
@@ -123,7 +114,7 @@ class ProjectsController extends Controller
 
         $project = Project::with(['teamMembers', 'tickets.workers'])->find($id);
         if (!$project) {
-            return redirect()->route('projects.index')
+            return redirect()->route('projects.projects')
                 ->with('info', 'Project not found or no longer exists.');
         }
 
@@ -131,7 +122,7 @@ class ProjectsController extends Controller
         $isAdmin = $user->isAdmin();
 
         if ( !$isMember && !$isAdmin ) {
-            return redirect()->route('projects.index')
+            return redirect()->route('projects.projects')
                 ->with('error', 'You are not allowed to access this project.');
         }
 
@@ -165,7 +156,7 @@ class ProjectsController extends Controller
             'team_members.*' => 'exists:users,id',
             'team_roles' => 'nullable|array',
         ]);
-// Handle contract upload
+
         // Handle contract upload
         if ($request->hasFile('contract')) {
             // Delete old contract
@@ -218,10 +209,12 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Delete a project
+     * Delete a project based on an id
      */
-    public function destroy(Project $project)
+    public function destroy(int $id)
     {
+        $project = Project::findOrFail($id);
+
         // Delete the contract if it exists
         if ($project->contract) {
             Storage::disk('public')->delete($project->contract);
@@ -229,7 +222,7 @@ class ProjectsController extends Controller
 
         $project->delete();
 
-        return redirect()->route('projects.index')
+        return redirect()->route('projects.projects')
             ->with('success', 'Project deleted successfully.');
     }
 }

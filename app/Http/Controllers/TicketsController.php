@@ -36,20 +36,12 @@ class TicketsController extends Controller
     /**
      * Show the creation from
      */
-    public function create()
+    public function showCreate()
     {
         $projects = Project::all();
         $users = User::all();
 
         return view('tickets.ticket-creation', compact('projects', 'users'));
-    }
-
-    /**
-     * Alias for create (route /ticket-creation)
-     */
-    public function creation()
-    {
-        return $this->create();
     }
 
     /**
@@ -149,7 +141,7 @@ class TicketsController extends Controller
         $isAdmin = $user->isAdmin();
 
         if (!$isMember && !$isAdmin) {
-            return redirect()->route('tickets.index')
+            return redirect()->route('tickets.tickets')
                 ->with('info', 'Access denied.');
         }
 
@@ -231,10 +223,12 @@ class TicketsController extends Controller
     }
 
     /**
-     * Delete a ticket
+     * Delete a ticket based on an id
      */
-    public function destroy(Ticket $ticket)
+    public function destroy(int $id)
     {
+        $ticket = Ticket::findOrFail($id);
+
         foreach ($ticket->attachments as $attachment) {
             Storage::disk('public')->delete($attachment->file_name);
             $attachment->delete();

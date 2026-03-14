@@ -16,17 +16,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Supprimer tous les fichiers uploadés précédemment
+        // Delete all the previously uploaded files
         $foldersToClean = ['contracts', 'attachments'];
         foreach ($foldersToClean as $folder) {
             if (Storage::disk('public')->exists($folder)) {
                 $files = Storage::disk('public')->files($folder);
                 Storage::disk('public')->delete($files);
-                $this->command->info("Dossier '{$folder}' cleared (" . count($files) . " file(s) deleted).");
+                $this->command->info("Folder '{$folder}' cleared (" . count($files) . " file(s) deleted).");
             }
         }
 
-        // Créer un administrateur
+        // Create an admin
         $admin = User::create([
             'first_name' => 'Admin',
             'last_name' => 'System',
@@ -34,10 +34,10 @@ class DatabaseSeeder extends Seeder
             'password_hashed' => Hash::make('password'),
             'role' => 'Administrator',
             'join_date' => now(),
-            'language' => 'fr',
+            'language' => 'en',
         ]);
 
-        // Créer des utilisateurs de test
+        // Create users
         $users = [];
         $users[] = User::create([
             'first_name' => 'Jean',
@@ -46,7 +46,7 @@ class DatabaseSeeder extends Seeder
             'password_hashed' => Hash::make('password'),
             'role' => 'Guest',
             'join_date' => now(),
-            'language' => 'fr',
+            'language' => 'en',
         ]);
 
         $users[] = User::create([
@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
             'password_hashed' => Hash::make('password'),
             'role' => 'Guest',
             'join_date' => now(),
-            'language' => 'fr',
+            'language' => 'en',
         ]);
 
         $users[] = User::create([
@@ -66,10 +66,10 @@ class DatabaseSeeder extends Seeder
             'password_hashed' => Hash::make('password'),
             'role' => 'Guest',
             'join_date' => now(),
-            'language' => 'fr',
+            'language' => 'en',
         ]);
 
-        // Créer des projets
+        // Create projects
         $project1 = Project::create([
             'name' => 'Site Web E-commerce',
             'status' => 'In Progress',
@@ -100,7 +100,7 @@ class DatabaseSeeder extends Seeder
             'spent_time' => 120.00,
         ]);
 
-        // Attacher les utilisateurs aux projets
+        // Attach users to the projects
         $project1->teamMembers()->attach($admin->id, ['role' => 'Owner']);
         $project1->teamMembers()->attach($users[0]->id, ['role' => 'Maintainer']);
         $project1->teamMembers()->attach($users[1]->id, ['role' => 'Maintainer']);
@@ -111,7 +111,7 @@ class DatabaseSeeder extends Seeder
         $project3->teamMembers()->attach($users[0]->id, ['role' => 'Owner']);
         $project3->teamMembers()->attach($users[1]->id, ['role' => 'Maintainer']);
 
-        // Créer des tickets pour le projet 1
+        // Create tickets for project 1
         $ticket1 = Ticket::create([
             'name' => 'Mise en place de l\'authentification',
             'project_id' => $project1->id,
@@ -145,7 +145,7 @@ class DatabaseSeeder extends Seeder
             'spent_time' => 0.00,
         ]);
 
-        // Créer des tickets pour le projet 2
+        // Create tickets for project 2
         $ticket4 = Ticket::create([
             'name' => 'Maquette UI/UX',
             'project_id' => $project2->id,
@@ -157,7 +157,7 @@ class DatabaseSeeder extends Seeder
             'spent_time' => 8.00,
         ]);
 
-        // Attacher les travailleurs aux tickets
+        // Attach users to the tickets
         $ticket1->workers()->attach($users[0]->id, ['role' => 'Ticket Creator']);
         $ticket1->workers()->attach($users[1]->id, ['role' => 'Helper']);
 
@@ -168,10 +168,11 @@ class DatabaseSeeder extends Seeder
 
         $ticket4->workers()->attach($users[2]->id, ['role' => 'Ticket Creator']);
 
-        $this->command->info('Database populated successfully.!');
+        $this->command->info('Database populated successfully !');
         $this->command->info('Admin: admin@example.com / password');
         $this->command->info('Users: jean.dupont@example.com / password');
         $this->command->info('       marie.martin@example.com / password');
         $this->command->info('       pierre.bernard@example.com / password');
+        $this->command->info('Please run "php artisan serve" to start the host');
     }
 }
