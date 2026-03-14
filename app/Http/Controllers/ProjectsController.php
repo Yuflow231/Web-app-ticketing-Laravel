@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use phpDocumentor\Reflection\Types\Null_;
 
 class ProjectsController extends Controller
 {
@@ -56,8 +58,8 @@ class ProjectsController extends Controller
             'name' => 'required|string|max:150',
             'description' => 'nullable|string',
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
-            'estimated_time' => 'nullable|numeric|min:0',
-            'contract' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'closing_date' => 'nullable|date',
+            'contract' => 'nullable|file|max:10240',
             'team_members' => 'nullable|array',
             'team_members.*' => 'exists:users,id',
             'team_roles' => 'nullable|array',
@@ -65,13 +67,33 @@ class ProjectsController extends Controller
 
         // Handle contract upload
         if ($request->hasFile('contract')) {
-            $contractPath = $request->file('contract')->store('contracts', 'public');
+            $file = $request->file('contract');
+
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+
+            $safeBaseName = Str::of($originalName)
+                ->ascii()
+                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                ->trim('_')
+                ->value();
+
+            if ($safeBaseName === '') {
+                $safeBaseName = 'contract';
+            }
+
+            $timestamp = now()->format('Ymd_His');
+            $fileName = "{$safeBaseName}_{$timestamp}.{$extension}";
+
+            $contractPath = $file->storeAs('contracts', $fileName, 'public');
             $validated['contract'] = $contractPath;
         }
 
         $validated['creation_date'] = now();
+        $validated['closing_date'] = $validated['closing_date'] ?? null;
         $validated['progress_percent'] = 0;
         $validated['spent_time'] = 0;
+        $validated['estimated_time'] = 0;
 
         $project = Project::create($validated);
 
@@ -88,7 +110,7 @@ class ProjectsController extends Controller
             $project->teamMembers()->attach(Auth::id(), ['role' => 'Owner']);
         }
 
-        return redirect()->route('projects.show', $project)
+        return redirect()->route('projects.project-details', $project->id)
             ->with('success', 'Project created successfully.');
     }
 
@@ -101,7 +123,7 @@ class ProjectsController extends Controller
 
         $project = Project::with(['teamMembers', 'tickets.workers'])->find($id);
         if (!$project) {
-            return redirect()->route('tickets.index')
+            return redirect()->route('projects.index')
                 ->with('info', 'Project not found or no longer exists.');
         }
 
@@ -110,7 +132,7 @@ class ProjectsController extends Controller
 
         if ( !$isMember && !$isAdmin ) {
             return redirect()->route('projects.index')
-                ->with('info', 'Access denied.');
+                ->with('error', 'You are not allowed to access this project.');
         }
 
         return view('projects.project-details', compact('project'));
@@ -138,19 +160,39 @@ class ProjectsController extends Controller
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
             'progress_percent' => 'required|integer|min:0|max:100',
             'estimated_time' => 'nullable|numeric|min:0',
-            'contract' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'contract' => 'nullable|file|max:10240',
             'team_members' => 'nullable|array',
             'team_members.*' => 'exists:users,id',
             'team_roles' => 'nullable|array',
         ]);
-
+// Handle contract upload
         // Handle contract upload
         if ($request->hasFile('contract')) {
             // Delete old contract
             if ($project->contract) {
+
                 Storage::disk('public')->delete($project->contract);
             }
-            $contractPath = $request->file('contract')->store('contracts', 'public');
+
+            $file = $request->file('contract');
+
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+
+            $safeBaseName = Str::of($originalName)
+                ->ascii()
+                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                ->trim('_')
+                ->value();
+
+            if ($safeBaseName === '') {
+                $safeBaseName = 'contract';
+            }
+
+            $timestamp = now()->format('Ymd_His');
+            $fileName = "{$safeBaseName}_{$timestamp}.{$extension}";
+
+            $contractPath = $file->storeAs('contracts', $fileName, 'public');
             $validated['contract'] = $contractPath;
         }
 
@@ -171,7 +213,7 @@ class ProjectsController extends Controller
             $project->teamMembers()->sync($syncData);
         }
 
-        return redirect()->route('projects.show', $project)
+        return redirect()->route('projects.project-details', $project->id)
             ->with('success', 'Project updated successfully.');
     }
 

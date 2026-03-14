@@ -5,6 +5,7 @@
 @endsection
 
 @section('resources')
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -26,7 +27,7 @@
 
 
                     <!-- <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" > -->
-                    <img src="{{ !empty(auth()->user()->profile_pic) ? asset('assets/images/'.auth()->user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
+                    <img src="{{ !empty(auth()->user()->profile_pic) ? Storage::url(auth()->user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
 
                 </header>
 
@@ -39,11 +40,16 @@
                         <label>Member Since</label>
                         <p>{{ optional(auth()->user()->created_at)->format("Y-m-d") }}</p>
                     </div>
-                    <div>
+                    <div style="display: flex; gap: var(--spacing-sm);">
                         <button type="button" class="btn">Edit</button>
+
+                        @if(!auth()->user()->isAdmin())
+                            <button type="button" class="btn btn--danger">Delete account</button>
+                        @endif
                     </div>
                 </div>
             </section>
+
 
             <div class="detail-side">
                 <section class="detail-card">

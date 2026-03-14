@@ -7,6 +7,7 @@
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
     @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -53,9 +54,9 @@
                 <table id="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Project name</th>
-                        <th>Owner</th>
+                        <th style="width: 5%">ID</th>
+                        <th style="width: 20%">Project name</th>
+                        <th  style="width: 20%">Owner</th>
                         <th>Status</th>
                         <th>Progress</th>
                         <th>Creation date</th>
@@ -69,10 +70,10 @@
                         @php $owner = $project->owner->first(); @endphp
                         <tr>
                             <td data-label="ID">#{{ $project->id }}</td>
-                            <td data-label="Project name"><strong>{{ $project->name }}</strong></td>
-                            <td data-label="Client">
+                            <td data-label="Project name" class="text-cell"><strong>{{ $project->name }}</strong></td>
+                            <td data-label="Client" class="text-cell">
                                 <div class="user-profile-inline">
-                                    <img src="{{ !empty($owner->profile_pic) ? asset('assets/images/'.$owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
+                                    <img src="{{ $owner->profile_pic ? Storage::url($owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
                                     <span style="margin-left: var(--spacing-sm)">{{ $owner->first_name.' '.$owner->last_name}}</span>
                                 </div>
                             </td>
@@ -99,8 +100,8 @@
 
                     <tr>
                         <td data-label="ID">#2</td>
-                        <td data-label="Project name"><strong>Skyblocker</strong></td>
-                        <td data-label="Client">
+                        <td data-label="Project name" class="text-cell"><strong>Skyblocker</strong></td>
+                        <td data-label="Client" class="text-cell">
                             <div class="user-profile-inline">
                                 <img src="{{ asset("assets/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
                                 <span style="margin-left: var(--spacing-sm)">VicIsACat</span>

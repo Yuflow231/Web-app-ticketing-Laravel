@@ -27,19 +27,4 @@ class TicketAttachment extends Model
         return $this->belongsTo(Ticket::class);
     }
 
-    /**
-     * Get the whole file path
-     */
-    public function getFilePathAttribute(): string
-    {
-        return storage_path('app/public/attachments/' . $this->file_name);
-    }
-
-    /**
-     * Get the public file path
-     */
-    public function getFileUrlAttribute(): string
-    {
-        return asset('storage/attachments/' . $this->file_name);
-    }
 }

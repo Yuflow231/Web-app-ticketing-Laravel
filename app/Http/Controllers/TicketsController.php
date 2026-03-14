@@ -9,6 +9,7 @@ use App\Models\TicketAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TicketsController extends Controller
 {
@@ -56,6 +57,10 @@ class TicketsController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Auth::user()?->isAdmin() && !$request->filled('type')) {
+            $request->merge(['type' => 'Included']);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:150',
             'project_id' => 'required|exists:projects,id',
@@ -63,13 +68,13 @@ class TicketsController extends Controller
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
             'priority' => 'required|in:High,Medium,Low',
             'type' => 'required|in:Billed,Included',
-            'estimated_time' => 'nullable|numeric|min:0',
             'workers' => 'nullable|array',
             'workers.*' => 'exists:users,id',
             'worker_roles' => 'nullable|array',
-            'attachments.*' => 'nullable|file|max:10240',
+            'attachments.*' => 'nullable|file|max:65536',
         ]);
 
+        $validated['estimated_time'] = 0;
         $validated['spent_time'] = 0;
 
         $ticket = Ticket::create($validated);
@@ -87,20 +92,35 @@ class TicketsController extends Controller
             $ticket->workers()->attach(Auth::id(), ['role' => 'Ticket Creator']);
         }
 
-        // Handle attachments
+        // Handle attachments — store with readable name, save full path in DB
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('attachments', $filename, 'public');
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $extension    = $file->getClientOriginalExtension();
+
+                $safeBaseName = Str::of($originalName)
+                    ->ascii()
+                    ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                    ->trim('_')
+                    ->value();
+
+                if ($safeBaseName === '') {
+                    $safeBaseName = 'attachment';
+                }
+
+                $fileName = $safeBaseName . '_' . now()->format('Ymd_His') . '.' . $extension;
+
+                // Store in attachments/ folder — storeAs returns "attachments/fileName"
+                $path = $file->storeAs('attachments', $fileName, 'public');
 
                 TicketAttachment::create([
                     'ticket_id' => $ticket->id,
-                    'file_name' => $filename,
+                    'file_name' => $path, // full path: "attachments/fileName.ext"
                 ]);
             }
         }
 
-        return redirect()->route('tickets.show', $ticket)
+        return redirect()->route('tickets.ticket-details', $ticket->id)
             ->with('success', 'Ticket created successfully.');
     }
 
@@ -110,10 +130,18 @@ class TicketsController extends Controller
     public function details(int $id)
     {
         $user = Auth::user();
-        $ticket = Ticket::with(['project', 'workers', 'attachments'])->find($id);
 
+        // Fail-safe: unauthenticated user
+        if (!$user) {
+            return redirect()->route('login')
+                ->with('info', 'Please sign in to access ticket details.');
+        }
+
+        $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
+
+        // Fail-safe: ticket deleted or invalid id
         if (!$ticket) {
-            return redirect()->route('tickets.index')
+            return redirect()->route('tickets.tickets')
                 ->with('info', 'Ticket not found or no longer exists.');
         }
 
@@ -157,7 +185,7 @@ class TicketsController extends Controller
             'workers' => 'nullable|array',
             'workers.*' => 'exists:users,id',
             'worker_roles' => 'nullable|array',
-            'attachments.*' => 'nullable|file|max:10240',
+            'attachments.*' => 'nullable|file|max:65536',
         ]);
 
         $ticket->update($validated);
@@ -172,20 +200,33 @@ class TicketsController extends Controller
             $ticket->workers()->sync($syncData);
         }
 
-        // Handle the new attachments
+        // Handle the new attachments — store with readable name, save full path in DB
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('attachments', $filename, 'public');
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $extension    = $file->getClientOriginalExtension();
+
+                $safeBaseName = Str::of($originalName)
+                    ->ascii()
+                    ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                    ->trim('_')
+                    ->value();
+
+                if ($safeBaseName === '') {
+                    $safeBaseName = 'attachment';
+                }
+
+                $fileName = $safeBaseName . '_' . now()->format('Ymd_His') . '.' . $extension;
+                $path = $file->storeAs('attachments', $fileName, 'public');
 
                 TicketAttachment::create([
                     'ticket_id' => $ticket->id,
-                    'file_name' => $filename,
+                    'file_name' => $path,
                 ]);
             }
         }
 
-        return redirect()->route('tickets.show', $ticket)
+        return redirect()->route('tickets.ticket-details', $ticket->id)
             ->with('success', 'Ticket updated successfully.');
     }
 
@@ -194,15 +235,14 @@ class TicketsController extends Controller
      */
     public function destroy(Ticket $ticket)
     {
-        // Supprimer les pièces jointes
         foreach ($ticket->attachments as $attachment) {
-            Storage::disk('public')->delete('attachments/' . $attachment->file_name);
+            Storage::disk('public')->delete($attachment->file_name);
             $attachment->delete();
         }
 
         $ticket->delete();
 
-        return redirect()->route('tickets.index')
+        return redirect()->route('tickets.tickets')
             ->with('success', 'Ticket deleted successfully.');
     }
 
@@ -211,7 +251,8 @@ class TicketsController extends Controller
      */
     public function deleteAttachment(TicketAttachment $attachment)
     {
-        Storage::disk('public')->delete('attachments/' . $attachment->file_name);
+        // file_name already contains the full path e.g. "attachments/fileName.ext"
+        Storage::disk('public')->delete($attachment->file_name);
         $attachment->delete();
 
         return back()->with('success', 'Attachment deleted successfully.');

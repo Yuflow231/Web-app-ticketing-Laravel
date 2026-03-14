@@ -53,7 +53,10 @@ function renderFileList() {
     fileListDisplay.innerHTML = ''; // Reset list
     selectedFiles.forEach((file, index) => {
         const listItem = document.createElement('li');
-        listItem.textContent = file.name;
+
+        const itemName = document.createElement('p');
+        itemName.classList.add('file-name')
+        itemName.textContent = file.name;
 
         // Add a button to remove a file
         const removeButton = document.createElement('button');
@@ -65,6 +68,7 @@ function renderFileList() {
             renderFileList(); // Update render
         });
 
+        listItem.appendChild(itemName);
         listItem.appendChild(removeButton);
         fileListDisplay.appendChild(listItem);
     });

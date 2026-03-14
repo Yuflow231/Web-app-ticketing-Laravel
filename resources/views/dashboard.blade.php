@@ -7,6 +7,7 @@
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
     @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -73,7 +74,7 @@
                 <table>
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 5%">ID</th>
                         <th>Title</th>
                         <th>Project</th>
                         <th>Status</th>
@@ -87,15 +88,15 @@
                     <!-- Tickets will be loaded here -->
                     @foreach($recentTickets as $ticket)
                     <tr>
-                        <td data-label="ID">{{$ticket->id}}</td>
-                        <td data-label="Title"><strong>{{$ticket->name}}</strong></td>
-                        <td data-label="Project">{{$ticket->project->name}}</td>
+                        <td data-label="ID">#{{$ticket->id}}</td>
+                        <td data-label="Title" class="text-cell"><strong>{{$ticket->name}}</strong></td>
+                        <td data-label="Project" class="text-cell">{{$ticket->project->name}}</td>
                         <td data-label="Status"><span class="badge @php setBadgeColor($ticket->status) @endphp">{{$ticket->status}}</span></td>
                         <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{$ticket->priority}}</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
                                 @foreach($ticket->workers as $worker)
-                                    <img src="{{ !empty($worker->profile_pic) ? asset('assets/images/'.$worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->first_name. ' ' .$worker->last_name }}" alt="profile-picture" class="profile-pic-mini">
+                                    <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->first_name. ' ' .$worker->last_name }}" alt="profile-picture" class="profile-pic-mini">
                                 @endforeach
                             </div>
                         </td>

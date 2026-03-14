@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Facades\Storage; @endphp
 @php
 /**
  * Helper function to generate navigation links with proper active state and debug param
@@ -27,7 +28,7 @@ function laink($route): void {
                 <span class="username" data-type="last-name"> {{ auth()->user()->last_name }} </span>
 
                 <!-- <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" > -->
-                <img src="{{ !empty(auth()->user()->profile_pic) ? asset('assets/images/'.auth()->user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
+                <img src="{{ Auth::user()->profile_pic ? asset('assets/images/' . Auth::user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
             </a>
         </div>
     </header>

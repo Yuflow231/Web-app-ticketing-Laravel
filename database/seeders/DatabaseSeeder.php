@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Ticket;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +16,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Supprimer tous les fichiers uploadés précédemment
+        $foldersToClean = ['contracts', 'attachments'];
+        foreach ($foldersToClean as $folder) {
+            if (Storage::disk('public')->exists($folder)) {
+                $files = Storage::disk('public')->files($folder);
+                Storage::disk('public')->delete($files);
+                $this->command->info("Dossier '{$folder}' cleared (" . count($files) . " file(s) deleted).");
+            }
+        }
+
         // Créer un administrateur
         $admin = User::create([
             'first_name' => 'Admin',
@@ -157,7 +168,7 @@ class DatabaseSeeder extends Seeder
 
         $ticket4->workers()->attach($users[2]->id, ['role' => 'Ticket Creator']);
 
-        $this->command->info('Base de données peuplée avec succès!');
+        $this->command->info('Database populated successfully.!');
         $this->command->info('Admin: admin@example.com / password');
         $this->command->info('Users: jean.dupont@example.com / password');
         $this->command->info('       marie.martin@example.com / password');

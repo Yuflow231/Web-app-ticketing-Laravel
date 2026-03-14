@@ -7,6 +7,7 @@
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
     @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -30,12 +31,14 @@
                         <label>Status</label>
                         <span class="badge @php setBadgeColor($project->status) @endphp" style="text-align: center;">{{ $project->status }}</span>
                     </div>
-                    <div class="detail-item" style="text-align: center;">
-                        <label>Closing date</label>
-                        <p id="closing-date">
-                            {{ optional($project->created_at)->format("Y-m-d") }}
-                        </p>
-                    </div>
+                    @if($project->closing_date)
+                        <div class="detail-item" style="text-align: center;">
+                            <label>Closing date</label>
+                            <p id="closing-date">
+                                {{ optional($project->closing_date)->format("Y-m-d") }}
+                            </p>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="detail-item">
@@ -69,7 +72,7 @@
                     <div id="collaborator-list">
                         @foreach($project->teamMembers as $member)
                             <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
-                                <img src="{{ !empty($member->profile_pic) ? asset('assets/images/'.$member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
+                                <img src="{{ $member->profile_pic ? asset('assets/images/' . $member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
                                 <div class="item-stacked" style="margin-left: var(--spacing-sm);">
                                     <div>
                                         <span class="username" data-type="first-name">{{ $member->first_name }}</span>
@@ -118,8 +121,8 @@
                     <table id="table" style="width: 100%; font-size: 0.9rem;">
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Ticket Title</th>
+                            <th style="width: 5%">ID</th>
+                            <th style="width: 40%">Ticket Title</th>
                             <th>Status</th>
                             <th>Priority</th>
                             <th>Type</th>
@@ -130,7 +133,7 @@
                         @foreach($project->tickets as $ticket)
                             <tr>
                                 <td data-label="ID">#{{ $ticket->id }}</td>
-                                <td data-label="Title"><strong>{{ $ticket->name }}</strong></td>
+                                <td data-label="Title" class="text-cell"><strong>{{ $ticket->name }}</strong></td>
                                 <td data-label="Status"><span class="badge @php setBadgeColor($ticket->status) @endphp">{{ $ticket->status }}</span></td>
                                 <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{ $ticket->priority }}</span></td>
                                 <td data-label="Type"><span class="badge @php setBadgeColor($ticket->type) @endphp">{{ $ticket->type }}</span></td>
@@ -140,7 +143,7 @@
 
                         <tr>
                             <td data-label="ID">#3</td>
-                            <td data-label="Title"><strong>Implement Dark Mode</strong></td>
+                            <td data-label="Title" class="text-cell"><strong>Implement Dark Mode</strong></td>
                             <td data-label="Status"><span class="badge blue">New</span></td>
                             <td data-label="Priority"><span class="badge green">Low</span></td>
                             <td data-label="Type"><span class="badge red">Billed</span></td>
@@ -151,33 +154,24 @@
                 </div>
             </section>
 
-            <div class="detail-card full-width" id="file-list">
+            <div class="detail-card full-width">
                 <h2>Files associated</h2>
                 <button class="btn" style="margin-bottom: var(--spacing-sm)">Edit documents</button>
-                <ul>
+                <ul id="file-list"  style="list-style-type: none;">
                     @if($project->contract)
                         <li>
-                            Contract test
-                            <div style="color: var(--primary-color);">
-                                <a href="{{ asset("assets/images/icon.png") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                <a href="{{ asset("assets/images/icon.png") }}" download="test_file_contract" class="icon"><i class="fa-solid fa-download"></i></a>
+                            <p class="file-name"> {{ basename($project->contract) }} </p>
+                            <div style="color: var(--primary-color); flex-shrink: 0;">
+                                <a href="{{ Storage::url($project->contract) }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                <a href="{{ Storage::url($project->contract) }}" download="{{ basename($project->contract) }}" class="icon"><i class="fa-solid fa-download"></i></a>
                             </div>
                         </li>
+                    @else
+                        <li>
+                            <p class="file-name">No files associated</p>
+                        </li>
                     @endif
-                    <li>
-                        Visual Examples
-                        <div style="color: var(--primary-color);">
-                            <a href="{{ asset("assets/images/yuflow.jpg") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                            <a href="{{ asset("assets/images/yuflow.jpg") }}" download="test_file_1" class="icon"><i class="fa-solid fa-download"></i></a>
-                        </div>
-                    </li>
-                    <li>
-                        Visual Examples
-                        <div style="color: var(--primary-color);">
-                            <a href="{{ asset("assets/images/img.png") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                            <a href="{{ asset("assets/images/img.png") }}" download="test_file_2" class="icon"><i class="fa-solid fa-download"></i></a>
-                        </div>
-                    </li>
+
                 </ul>
             </div>
         </div>

@@ -27,13 +27,13 @@ class DashController extends Controller
         // Recent projects
         $recentProjects = Project::with('teamMembers', 'tickets')
             ->latest()
-            ->take(5)
+            ->take(6)
             ->get();
 
         // Recent tickets
         $recentTickets = Ticket::with(['project', 'workers'])
             ->latest()
-            ->take(10)
+            ->take(6)
             ->get();
 
         return view('dashboard', compact(

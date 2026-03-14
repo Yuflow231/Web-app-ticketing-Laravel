@@ -111,6 +111,15 @@ textarea {
     margin-bottom: var(--spacing-sm);
 }
 
+.file-name {
+    margin: 0;
+    width: 25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
 .removeBtn {
     color: var(--danger-color);
     cursor: pointer;
@@ -153,4 +162,17 @@ input[type="checkbox"]:checked {
     border-color: var(--primary-color);
     content: '✓';
     color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .file-name{
+        width: 20rem;
+    }
 }

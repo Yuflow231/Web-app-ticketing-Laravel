@@ -6,6 +6,7 @@
 
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -16,19 +17,29 @@
             <h1>Project creation</h1>
         </header>
 
-        <form id="project-form" class="form-box" method="POST" enctype="multipart/form-data">
+        @if ($errors->any())
+            <div class="alert alert-danger" style="margin-bottom: 1rem;">
+                <ul style="margin: 0; padding-left: 1.2rem;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form id="project-form" class="form-box" method="POST" action="{{ route('projects.store') }}" enctype="multipart/form-data">
+            @csrf
             <div class="form-2elements">
                 <div class="form-item-stacked">
                     <label for="project-name">Project's name *</label>
-                    <input type="text" id="project-name" name="project-name" placeholder="Project's name" required>
+                    <input type="text" id="project-name" name="name" placeholder="Project's name" required>
                 </div>
                 <div class="form-item-stacked">
                     <label>Owner *</label>
                     <!-- Guest: locked to self -->
                     <div class="user-profile-inline" style="padding: var(--spacing-sm); border: 1px solid #ddd; border-radius: var(--radius-md); opacity: 0.8;">
-                        <img src="{{ asset("assets/images/yuflow.jpg") }}" class="profile-pic-mini" alt="profile-pic">
-                        <span style="margin-left: var(--spacing-sm)">Yuflow</span>
-                        <span>Furry</span>
+                        <img src="{{ Auth::user()->profile_pic ? asset('assets/images/' . Auth::user()->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic-mini" alt="profile-pic">
+                        <span style="margin-left: var(--spacing-sm)">{{ Auth::user()->first_name. ' ' . Auth::user()->last_name }}</span>
                     </div>
                 </div>
             </div>
@@ -40,14 +51,14 @@
                     <input type="date" id="start-date" name="start-date">
                 </div> -->
                 <div class="form-item-stacked">
-                    <label for="end-date">Estimated ending date</label>
-                    <input type="date" id="end-date" name="end-date">
+                    <label for="end-date">Closing date</label>
+                    <input type="date" id="end-date" name="closing_date">
                 </div>
             </div>
 
             <div class="form-item-stacked">
                 <label for="project-status">Status</label>
-                <select id="project-status" name="project-status">
+                <select id="project-status" name="status">
                     <option value="" selected hidden disabled>Select a status</option>
                     <option value="New">New</option>
                     <option value="In Progress">In Progress</option>
@@ -57,14 +68,14 @@
 
             <div class="form-item-stacked">
                 <label for="project-description">Description</label>
-                <textarea id="project-description" name="project-description" rows="6" placeholder="Project's description"></textarea>
+                <textarea id="project-description" name="description" rows="6" placeholder="Project's description"></textarea>
             </div>
 
             <div class="form-item-stacked">
                 <label for="drop-file">Attached files</label>
                 <div id="drop-zone">
                     <p>Drag and drop files here or click to select files</p>
-                    <input type="file" id="drop-file" name="drop-file[]" style="display: none;">
+                    <input type="file" id="drop-file" name="contract" style="display: none;">
                 </div>
                 <ul id="file-list"></ul>
             </div>
@@ -82,13 +93,9 @@
         import * as FormVerifier from "{{ asset("utils/js/form-verifs.js") }}";
         import * as DragDrop from "{{ asset("utils/js/drag-n-drop.js") }}";
 
-        // Form fields
         let formTitle  = document.getElementById("project-name");
-        // let formStart  = document.getElementById("start-date");
         let formEnd    = document.getElementById("end-date");
         let formStatus = document.getElementById("project-status");
-        let formFiles  = document.getElementById("file-list");
-        let formDrop   = document.getElementById("drop-zone");
 
         let canPress = true;
         let formButton = document.getElementById("actions");
@@ -100,19 +107,18 @@
 
         function verifyForm() {
             let formValidation = true;
-            FormVerifier.resetFormState([formTitle, formEnd, formStatus, formDrop]);
+            FormVerifier.resetFormState([formTitle, formEnd, formStatus]);
 
             formValidation &= FormVerifier.checkField(formTitle, formTitle, [FormVerifier.verifyEmptyness("Please enter a project's name")]);
-            // formValidation &= FormVerifier.checkField(formStart, formStart, [FormVerifier.verifyEmptyness("Please select a starting date"), FormVerifier.verifyDate("Starting date cannot be in the past")]);
+            // date is optional in backend, do not force emptiness
             formValidation &= FormVerifier.checkField(formEnd, formEnd, [FormVerifier.verifyEmptyness("Please select an ending date"), FormVerifier.verifyDate("Ending date cannot be in the past")]);
-            // formValidation &= FormVerifier.checkField([formStart, formEnd], formEnd, [FormVerifier.verifyDateDiff("The ending date must be after the starting date")]);
             formValidation &= FormVerifier.checkField(formStatus, formStatus, [FormVerifier.verifyEmptyness("Please select the project's status")]);
-            formValidation &= FormVerifier.checkField(formFiles, formDrop, [FormVerifier.verifyFile("Please send the project contract")]);
+            // contract is optional in backend, do not force file check
 
             if (formValidation) {
                 canPress = false;
-                //DragDrop.syncFilesToInput();
-                FormVerifier.validateForm("Creating project ...", "{{ route("projects.projects") }}");
+                FormVerifier.validateForm("Creating project ...");
+                document.getElementById("project-form").submit();
             }
         }
     </script>

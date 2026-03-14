@@ -7,6 +7,7 @@
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
     @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -73,7 +74,7 @@
                     <div id="collaborator-list">
                         @foreach($ticket->workers as $worker)
                             <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
-                                <img src="{{ !empty($worker->profile_pic) ? asset('assets/images/'.$worker->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
+                                <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
                                 <div class="item-stacked" style="margin-left: var(--spacing-sm);">
                                     <div>
                                         <span class="username" data-type="first-name">{{ $worker->first_name }}</span>
@@ -98,33 +99,25 @@
                 </section>
             </div>
 
-            <div class="detail-card full-width" id="file-list">
+            <div class="detail-card full-width">
                 <h2>Files associated</h2>
                 <button class="btn" style="margin-bottom: var(--spacing-sm)">Edit documents</button>
-                <ul>
-                    @foreach($ticket->attachments as $attachment)
+                <ul id="file-list">
+                    @if($ticket->attachments->isNotEmpty())
+                        @foreach($ticket->attachments as $attachment)
+                            <li>
+                                <p class="file-name"> {{ basename($attachment->file_name) }}</p>
+                                <div style="color: var(--primary-color); flex-shrink: 0;">
+                                    <a href="{{ Storage::url($attachment->file_name) }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="{{ Storage::url($attachment->file_name) }}" download="{{ basename($attachment->file_name) }}" class="icon"><i class="fa-solid fa-download"></i></a>
+                                </div>
+                            </li>
+                        @endforeach
+                    @else
                         <li>
-                            Visual Examples
-                            <div style="color: var(--primary-color);">
-                                <a href="{{ asset("assets/images/icon.png") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                <a href="{{ asset("assets/images/icon.png") }}" download="test_file_1" class="icon"><i class="fa-solid fa-download"></i></a>
-                            </div>
+                            <p class="file-name">No files associated</p>
                         </li>
-                    @endforeach
-                    <li>
-                        Visual Examples
-                        <div style="color: var(--primary-color);">
-                            <a href="{{ asset("assets/images/icon.png") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                            <a href="{{ asset("assets/images/icon.png") }}" download="test_file_1" class="icon"><i class="fa-solid fa-download"></i></a>
-                        </div>
-                    </li>
-                    <li>
-                        Visual Examples
-                        <div style="color: var(--primary-color);">
-                            <a href="{{ asset("assets/images/img.png") }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                            <a href="{{ asset("assets/images/img.png") }}" download="test_file_2" class="icon"><i class="fa-solid fa-download"></i></a>
-                        </div>
-                    </li>
+                    @endif
                 </ul>
             </div>
         </div>
