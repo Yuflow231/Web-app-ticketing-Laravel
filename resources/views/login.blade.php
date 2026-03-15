@@ -120,13 +120,8 @@
             FormVerifier.resetFormState([formMail, formPass]);
 
             // check each field with its corresponding checks
-            formValidation &= FormVerifier.checkField(formMail, formMail, [
-                FormVerifier.verifyEmptyness("Please enter your mail"),
-                FormVerifier.verifyMail("Email is invalid")
-            ]);
-            formValidation &= FormVerifier.checkField(formPass, formPass, [
-                FormVerifier.verifyEmptyness("Please enter your password")
-            ]);
+            formValidation &= FormVerifier.checkField(formMail, formMail, [FormVerifier.verifyEmptyness("Please enter your mail"), FormVerifier.verifyMail("Email is invalid")]);
+            formValidation &= FormVerifier.checkField(formPass, formPass, [FormVerifier.verifyEmptyness("Please enter your password")]);
 
             // if everything checks out
             if(formValidation){

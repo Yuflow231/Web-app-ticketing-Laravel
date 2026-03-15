@@ -133,10 +133,11 @@
 
 @section('modal')
     {{-- Delete ticket modal --}}
-    <dialog id="delete-modal" class="modal-container" style="width: 30%;">
+    <dialog id="delete-modal" class="modal-container">
         <h2>Delete ticket</h2>
-        <p style="margin-bottom: 1rem; color: var(--text-secondary);"> You are about to delete <br> <strong id="modal-project-name"></strong> <br> This action is irreversible. </p>
-        <form method="POST" action="#" id="delete-form">
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);"> You are about to delete <strong id="modal-project-name"></strong> </p>
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);text-align: center">This action is irreversible. </p>
+        <form method="POST" action="{{ route("profile-delete") }}" id="delete-form">
             @csrf
             @method('DELETE')
             <div class="inline-elements">

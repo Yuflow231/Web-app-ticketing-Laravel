@@ -91,8 +91,8 @@
             let formValidation = true;
             FormVerifier.resetFormState([formMail, formFirst, formLast, formPass, formConfirm]);
 
-            formValidation &= FormVerifier.checkField(formFirst,   formFirst,   [FormVerifier.verifyEmptyness("Please enter your first name")]);
-            formValidation &= FormVerifier.checkField(formLast,    formLast,    [FormVerifier.verifyEmptyness("Please enter your last name")]);
+            formValidation &= FormVerifier.checkField(formFirst,   formFirst,   [FormVerifier.verifyEmptyness("Please enter your first name"),  FormVerifier.verifyLengthName("First name must be lesser than 40 characters")]);
+            formValidation &= FormVerifier.checkField(formLast,    formLast,    [FormVerifier.verifyEmptyness("Please enter your last name"),  FormVerifier.verifyLengthName("Last name must be lesser than 40 characters")]);
             formValidation &= FormVerifier.checkField(formMail,    formMail,    [FormVerifier.verifyEmptyness("Please enter your mail"), FormVerifier.verifyMail("Email is invalid")]);
             formValidation &= FormVerifier.checkField(formPass,    formPass,    [FormVerifier.verifyEmptyness("Please enter a password"), FormVerifier.verifyLength("Password must be 8 characters long")]);
             formValidation &= FormVerifier.checkField(formConfirm, formConfirm, [FormVerifier.verifyEmptyness("Please confirm your password")]);

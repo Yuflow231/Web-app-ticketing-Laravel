@@ -41,7 +41,7 @@ class AccountController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The login details aren t valid.',
+            'email' => 'The login details aren\'t valid.',
         ])->onlyInput('email');
     }
 
@@ -94,11 +94,21 @@ class AccountController extends Controller
     }
 
     /**
-     * Show profile page
+     * Show profile page (read-only)
      */
     public function showProfile()
     {
         return view('profile', [
+            'user' => Auth::user()
+        ]);
+    }
+
+    /**
+     * Show profile edit page
+     */
+    public function editProfile()
+    {
+        return view('profile-edit', [
             'user' => Auth::user()
         ]);
     }
@@ -116,16 +126,33 @@ class AccountController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'language' => 'nullable|string|max:10',
             'profile_pic' => 'nullable|image|max:2048',
+            'remove_pic' => 'nullable|boolean',
         ]);
 
-        if ($request->hasFile('profile_pic')) {
+        // Handle profile picture removal
+        if ($request->input('remove_pic') == '1') {
+            if ($user->profile_pic && Storage::disk('public')->exists($user->profile_pic)) {
+                Storage::disk('public')->delete($user->profile_pic);
+            }
+            $validated['profile_pic'] = null;
+        }
+        // Handle profile picture upload
+        elseif ($request->hasFile('profile_pic')) {
+            // Delete old profile picture if it exists
+            if ($user->profile_pic && Storage::disk('public')->exists($user->profile_pic)) {
+                Storage::disk('public')->delete($user->profile_pic);
+            }
+
             $path = $request->file('profile_pic')->store('profiles', 'public');
             $validated['profile_pic'] = $path;
         }
 
+        // Remove remove_pic from validated data as it's not a database field
+        unset($validated['remove_pic']);
+
         $user->update($validated);
 
-        return back()->with('success', 'Profile updated successfully');
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
     }
 
     /**
@@ -167,6 +194,9 @@ class AccountController extends Controller
         return back()->with('success', 'Password updated successfully');
     }
 
+    /**
+     * Confirm deletion with password
+     */
     public function confirmDelete(Request $request)
     {
         $request->validate([
@@ -189,11 +219,16 @@ class AccountController extends Controller
     {
         $user = Auth::user();
 
+        // Prevent admin deletion
+        if ($user->isAdmin()) {
+            return back()->withErrors(['error' => 'Administrator accounts cannot be deleted.']);
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-
+        // Delete profile picture if exists
         if (!empty($user->profile_pic) && Storage::disk('public')->exists($user->profile_pic)) {
             Storage::disk('public')->delete($user->profile_pic);
         }
@@ -213,7 +248,7 @@ class AccountController extends Controller
                     Storage::disk('public')->delete($ownedProject->contract);
                 }
                 $ownedProject->delete();
-            }else{
+            } else {
                 $firstMember = $remainingMembers->first();
 
                 // Detach deleted user first

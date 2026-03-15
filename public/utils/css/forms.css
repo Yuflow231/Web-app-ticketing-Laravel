@@ -10,6 +10,8 @@
 .form-item,
 .form-item-stacked {
     margin-bottom: var(--spacing-lg);
+    flex: 1;
+    flex-wrap: wrap;
 }
 
 .form-item-stacked label {
@@ -43,7 +45,7 @@ textarea:focus {
 }
 
 .form-2elements {
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing-lg);
 }

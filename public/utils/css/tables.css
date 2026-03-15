@@ -55,8 +55,8 @@ td.text-cell {
 }
 
 .profile-pic-mini {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     border-radius: var(--radius-full);
     border: 2px solid var(--primary-color);
     object-fit: cover;

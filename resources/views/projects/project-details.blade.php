@@ -72,7 +72,7 @@
                     <div id="collaborator-list">
                         @foreach($project->teamMembers as $member)
                             <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
-                                <img src="{{ $member->profile_pic ? asset('assets/images/' . $member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
+                                <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
                                 <div class="item-stacked" style="margin-left: var(--spacing-sm);">
                                     <div>
                                         <span class="username" data-type="first-name">{{ $member->first_name }}</span>

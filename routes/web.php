@@ -40,8 +40,9 @@ Route::middleware('auth')->group(function () {
 
     // Profil
     Route::get('/profile', [AccountController::class, 'showProfile'])->name('profile');
-    Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile-update');
-    Route::delete('/profile', [AccountController::class, 'confirmDelete'])->name('profile-delete');
+    Route::get('/profile-edit', [AccountController::class, 'editProfile'])->name('profile.edit');
+    Route::put('/profile-update', [AccountController::class, 'updateProfile'])->name('profile.update');
+    Route::delete('/profile-delete', [AccountController::class, 'confirmDelete'])->name('profile-delete');
 
     // Password
     Route::put('/reset-password', [AccountController::class, 'updatePassword'])->name('password-update');

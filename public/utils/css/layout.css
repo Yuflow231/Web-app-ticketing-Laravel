@@ -127,6 +127,7 @@ section h2 {
     font-size: var(--font-size-3xl);
 }
 
+#profile-form .profile-pic,
 .profile-header .profile-pic{
     width: 9rem;
     height: 9rem;
@@ -163,6 +164,7 @@ section h2 {
         grid-template-columns: 1fr;
     }
 
+    #profile-form .profile-pic,
     .profile-header .profile-pic{
         width: 8rem;
         height: 8rem;

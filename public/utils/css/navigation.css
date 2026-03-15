@@ -143,11 +143,11 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    
+
     .side-nav.open {
         transform: translateX(0);
     }
-    
+
     .side-nav.collapsed {
         transform: translateX(-100%);
     }

@@ -75,7 +75,7 @@
                             <td data-label="Project name" class="text-cell"><strong>{{ $project->name }}</strong></td>
                             <td data-label="Client" class="text-cell">
                                 <div class="user-profile-inline">
-                                    <img src="{{ $owner->profile_pic ? Storage::url($owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
+                                    <img src="{{ $owner->profile_pic ? Storage::url($owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" >
                                     <span style="margin-left: var(--spacing-sm)">{{ $owner->first_name.' '.$owner->last_name}}</span>
                                 </div>
                             </td>
@@ -121,10 +121,10 @@
 
 @section('modal')
     {{-- Delete project modal --}}
-    <dialog id="delete-modal" class="modal-container" style="width: 30%;">
+    <dialog id="delete-modal" class="modal-container">
         <h2>Delete project</h2>
-        <p style="margin-bottom: 1rem; color: var(--text-secondary);"> You are about to delete <br> <strong id="modal-project-name"></strong> <br> This action is irreversible. </p>
-
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);"> You are about to delete <strong id="modal-project-name"></strong> </p>
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);text-align: center">This action is irreversible. </p>
         <form method="POST" action="#" id="delete-form">
             @csrf
             @method('DELETE')

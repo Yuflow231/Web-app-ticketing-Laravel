@@ -79,6 +79,13 @@ export function verifyLength(error) {
     }
 }
 
+export function verifyLengthName(error) {
+    return{
+        predicate : (input) => input.value.length > 40,
+        message : error,
+    }
+}
+
 
 export function verifyFile(error) {
     return{
