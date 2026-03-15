@@ -20,6 +20,8 @@
 <body>
 {{-- Je prévois l'injection de quelque chose ici (optionnel !) --}}
 @yield('content')
+
+@yield('modal')
 </body>
 @yield('js_page')
 </html>

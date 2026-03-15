@@ -7,6 +7,6 @@
 @import './cards.css';
 @import './forms.css';
 @import './tables.css';
+@import './modals.css';
 
 @import './toast.css';
-@import './debug.css';

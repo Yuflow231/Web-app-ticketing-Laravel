@@ -50,31 +50,6 @@
                 </div>
             </section>
 
-            @if(!auth()->user()->isAdmin())
-            {{-- Delete account modal --}}
-            <dialog id="delete-modal" class="modal-container">
-                <h2>Delete account</h2>
-                <p style="margin-bottom: 1rem; color: var(--text-secondary);">This action is irreversible. Enter your password to confirm.</p>
-
-                @if($errors->has('password'))
-                    <p style="color: red; margin-bottom: 0.5rem; font-size: var(--font-size-sm);">{{ $errors->first('password') }}</p>
-                @endif
-
-                <form method="POST" action="{{ route('profile') }}" id="delete-form">
-                    @csrf
-                    @method('DELETE')
-                    <div class="form-item-stacked">
-                        <label for="delete-password">Password</label>
-                        <input type="password" id="delete-password" name="password" required placeholder="Your current password">
-                    </div>
-                    <div class="inline-elements">
-                        <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
-                        <button type="submit" id="actions" class="btn btn--danger">Confirm deletion</button>
-                    </div>
-                </form>
-            </dialog>
-            @endif
-
             <div class="detail-side">
                 <section class="detail-card">
                     <h2>Preferences</h2>
@@ -98,6 +73,38 @@
             </div>
         </div>
     </main>
+@endsection
+
+@section('modal')
+    @if(!auth()->user()->isAdmin())
+        {{-- Delete account modal --}}
+        <dialog id="delete-modal" class="modal-container" style="width: 40%;">
+            <h2>Delete account</h2>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary);">This action is irreversible. Enter your password to confirm.</p>
+
+            @if($errors->has('password'))
+                <p style="color: red; margin-bottom: 0.5rem; font-size: var(--font-size-sm);">{{ $errors->first('password') }}</p>
+            @endif
+
+            <form method="POST" action="#" id="delete-form">
+                @csrf
+                @method('DELETE')
+                <div class="form-item-stacked">
+                    <label for="delete-password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="delete-password" name="password" required placeholder="Your current password">
+                        <span id="toggle-password" class="toggle-password">
+                                <i id="pass-icon" class="fa-solid fa-eye"></i>
+                            </span>
+                    </div>
+                </div>
+                <div class="inline-elements">
+                    <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
+                    <button type="submit" id="actions" class="btn btn--danger">Confirm deletion</button>
+                </div>
+            </form>
+        </dialog>
+    @endif
 @endsection
 
 @section('js_page')
@@ -132,8 +139,6 @@
             if(formValidation){
                 canPress = false;
 
-                FormVerifier.validateForm("Deleting account ...");
-                // loginForm.submit();
                 document.getElementById("delete-form").submit();
             }
         }

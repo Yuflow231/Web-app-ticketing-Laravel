@@ -109,23 +109,6 @@
             </div>
         </section>
 
-        {{-- Delete project modal --}}
-        <dialog id="delete-modal" class="modal-container">
-            <h2>Delete project</h2>
-            <p style="margin-bottom: 1rem; color: var(--text-secondary);">
-                You are about to delete <br> <strong id="modal-project-name"></strong> <br> This action is irreversible.
-            </p>
-
-            <form method="POST" action="#" id="delete-form">
-                @csrf
-                @method('DELETE')
-                <div class="inline-elements">
-                    <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
-                    <button type="submit" class="btn btn--danger">Confirm deletion</button>
-                </div>
-            </form>
-        </dialog>
-
         <footer class="page-footer">
             <div>
                 <button class="btn"><i class="fa-solid fa-angle-left"></i></button>
@@ -134,6 +117,23 @@
             </div>
         </footer>
     </main>
+@endsection
+
+@section('modal')
+    {{-- Delete project modal --}}
+    <dialog id="delete-modal" class="modal-container" style="width: 30%;">
+        <h2>Delete project</h2>
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);"> You are about to delete <br> <strong id="modal-project-name"></strong> <br> This action is irreversible. </p>
+
+        <form method="POST" action="#" id="delete-form">
+            @csrf
+            @method('DELETE')
+            <div class="inline-elements">
+                <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
+                <button type="submit" class="btn btn--danger">Confirm deletion</button>
+            </div>
+        </form>
+    </dialog>
 @endsection
 
 @section('js_page')

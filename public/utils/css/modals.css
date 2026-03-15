@@ -1,0 +1,74 @@
+.modal-select{
+    padding: var(--spacing-sm);
+    border: 1px solid #ddd;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    align-items: center;
+    display: flex;
+    font-size: var(--font-size-base);
+}
+
+.modal-container{
+    border-radius: var(--radius-md);
+    border: 1px solid #ddd;
+    padding: 2rem;
+    max-width: 600px;
+    width : 75%;
+    max-height: 75%;
+    margin: auto auto;
+}
+
+.modal-container::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-list-name{
+    font-weight: bold;
+}
+
+.modal-list-subname{
+    color : var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.modal-list{
+    max-height: 21rem;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: var(--radius-md);
+}
+
+/* Scrollbar for the list */
+.modal-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-list::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
+.modal-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-list::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+.modal-list-selectable{
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.modal-list-selectable:hover{
+    background: rgba(0, 10, 40, 0.05);;
+}

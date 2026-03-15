@@ -54,14 +54,7 @@
             <div class="form-item-stacked">
                 <label for="form-password">Password</label>
                 <div class="password-wrapper">
-                    <input
-                        type="password"
-                        id="form-password"
-                        name="password"
-                        placeholder="Password"
-                        required
-                        class="@error('password') input-error @enderror"
-                    >
+                    <input type="password" id="form-password" name="password" placeholder="Password" required class="@error('password') input-error @enderror">
                     <span id="toggle-password" class="toggle-password">
                         <i id="pass-icon" class="fa-solid fa-eye"></i>
                     </span>

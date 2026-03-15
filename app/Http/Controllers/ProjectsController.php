@@ -51,6 +51,7 @@ class ProjectsController extends Controller
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
             'closing_date' => 'nullable|date',
             'contract' => 'nullable|file|max:10240',
+            'owner_id' => 'nullable|exists:users,id',
             'team_members' => 'nullable|array',
             'team_members.*' => 'exists:users,id',
             'team_roles' => 'nullable|array',
@@ -80,6 +81,10 @@ class ProjectsController extends Controller
             $validated['contract'] = $contractPath;
         }
 
+        // don't include the owner_id in project's data as it doesn't actually exist
+        $ownerId = $validated['owner_id'] ?? Auth::id();
+        unset($validated['owner_id']);
+
         $validated['creation_date'] = now();
         $validated['closing_date'] = $validated['closing_date'] ?? null;
         $validated['progress_percent'] = 0;
@@ -96,9 +101,13 @@ class ProjectsController extends Controller
             }
         }
 
-        // Add the creator as "Owner" if not already in the team
-        if (!$project->teamMembers->contains(Auth::id())) {
-            $project->teamMembers()->attach(Auth::id(), ['role' => 'Owner']);
+        // Add the owner (from modal or current user)
+        // Check if owner is not already in team members
+        if (!$project->teamMembers->contains($ownerId)) {
+            $project->teamMembers()->attach($ownerId, ['role' => 'Owner']);
+        } else {
+            // If already a member, update the role to owner
+            $project->teamMembers()->updateExistingPivot($ownerId, ['role' => 'Owner']);
         }
 
         return redirect()->route('projects.project-details', $project->id)

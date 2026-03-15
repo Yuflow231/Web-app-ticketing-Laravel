@@ -38,10 +38,15 @@ class TicketsController extends Controller
      */
     public function showCreate()
     {
-        $projects = Project::all();
-        $users = User::all();
+        $user = Auth::user();
+        if($user->isAdmin()){
+            $projects = Project::all();
+        }
+        else{
+            $projects = $user->projects;
+        }
 
-        return view('tickets.ticket-creation', compact('projects', 'users'));
+        return view('tickets.ticket-creation', compact('projects'));
     }
 
     /**
