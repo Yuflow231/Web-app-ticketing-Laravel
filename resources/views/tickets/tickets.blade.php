@@ -103,7 +103,7 @@
                             </div>
                         </td>
                         <td data-label="Actions">
-                            <div style="display: flex; justify-content: space-evenly">
+                            <div style="display: flex; justify-content: space-evenly; font-size: var(--font-size-xl);">
                                 <a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
 
                                 <button type="button" class="icon btn-delete-project"

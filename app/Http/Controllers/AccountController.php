@@ -125,7 +125,7 @@ class AccountController extends Controller
             'last_name' => 'required|string|max:50',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'language' => 'nullable|string|max:10',
-            'profile_pic' => 'nullable|image|max:2048',
+            'profile_pic' => 'nullable|image|max:4096',
             'remove_pic' => 'nullable|boolean',
         ]);
 

@@ -35,7 +35,7 @@
 }
 
 .modal-list{
-    max-height: 21rem;
+    max-height: 16rem;
     overflow-y: auto;
     border: 1px solid #ddd;
     border-radius: var(--radius-md);
@@ -71,4 +71,10 @@
 
 .modal-list-selectable:hover{
     background: rgba(0, 10, 40, 0.05);;
+}
+
+@media only screen and (max-width: 768px) {
+    .modal-container{
+        width: 90%;
+    }
 }

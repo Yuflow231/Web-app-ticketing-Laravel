@@ -52,7 +52,7 @@
 
                             {{-- Upload Controls --}}
                             <div style="flex: 1;">
-                                <input type="file" id="profile-pic-input" name="profile_pic" accept="image/*" style="display: none;">
+                                <input type="file" id="profile-pic-input" name="profile_pic" style="display: none;">
                                 <input type="hidden" id="remove-pic" name="remove_pic" value="0">
 
                                 <button type="button" class="btn btn--outline" onclick="document.getElementById('profile-pic-input').click()" style="margin-bottom: 0.5rem;">
@@ -60,7 +60,7 @@
                                     Choose New Picture
                                 </button>
 
-                                <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">JPG, PNG or GIF. Max size 2MB.</p>
+                                <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">JPG, PNG or GIF. Max size 4MB.</p>
                             </div>
                         </div>
                     </div>
@@ -189,6 +189,7 @@
 @section('js_page')
     <script type="module">
         import * as FormVerifier from "{{ asset('utils/js/form-verifs.js') }}";
+        import Toast from "{{ asset('utils/js/toast.js') }}";
 
         // Profile Picture Preview
         const profilePicInput = document.getElementById('profile-pic-input');
@@ -198,16 +199,16 @@
             const file = e.target.files[0];
 
             if (file) {
-                // Validate file size (2MB)
-                if (file.size > 2 * 1024 * 1024) {
-                    alert('File size must be less than 2MB');
+                // Validate file type
+                if (!file.type.match('image.*')) {
+                    Toast('Please select an image file', "error");
                     profilePicInput.value = '';
                     return;
                 }
 
-                // Validate file type
-                if (!file.type.match('image.*')) {
-                    alert('Please select an image file');
+                // Validate file size (4MB)
+                if (file.size > 4 * 1024 * 1024) {
+                    Toast('File size must be less than 4MB', "error");
                     profilePicInput.value = '';
                     return;
                 }

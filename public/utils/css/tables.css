@@ -43,6 +43,10 @@ table a:hover{
     color: var(--primary-hover);
 }
 
+tbody tr:nth-child(even) {
+    background-color: #f0f0f0;
+}
+
 td.text-cell {
     overflow: hidden;
     text-overflow: ellipsis;

@@ -41,9 +41,9 @@
                     @endif
                 </div>
 
-                <div class="detail-item">
+                <div class="detail-item" style="max-width: 30rem;">
                     <label>Detailed Description</label>
-                    <p id="project-description">
+                    <p id="project-description" style="word-wrap: break-word;">
                         {{ $project->description }}
                     </p>
                 </div>
@@ -61,7 +61,7 @@
 
 
                 <div class="inline-elements" style="margin-top: auto; padding-top: 1rem;">
-                    <button class="btn">Edit Project</button>
+                    <button class="btn" onclick="location.href = '{{ route('projects.project-edit', $project->id) }}' ">Edit Project</button>
                     <button class="btn btn--danger">Close Project</button>
                 </div>
             </section>
@@ -146,8 +146,7 @@
             </section>
 
             <div class="detail-card full-width">
-                <h2>Files associated</h2>
-                <button class="btn" style="margin-bottom: var(--spacing-sm)">Edit documents</button>
+                <h2>Associated contract</h2>
                 <ul id="file-list"  style="list-style-type: none;">
                     @if($project->contract)
                         <li>
@@ -159,7 +158,7 @@
                         </li>
                     @else
                         <li>
-                            <p class="file-name">No files associated</p>
+                            <p class="file-name">No contract associate</p>
                         </li>
                     @endif
 

@@ -32,7 +32,7 @@
                     <div class="icon"><i class="fa-solid fa-ticket"></i></div>
                     <div class="stat-details">
                         <h3 id="stat-tickets">{{ $stats["active_projects"] }}</h3>
-                        <p class="text">Active Tickets</p>
+                        <p class="text">Active Projects</p>
                     </div>
                 </div>
                 <div class="stat-card">

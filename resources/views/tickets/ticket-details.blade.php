@@ -30,9 +30,9 @@
                     <p>{{ $ticket->project->name }}</p>
                 </div>
 
-                <div class="detail-item" >
+                <div class="detail-item" style="max-width: 30rem;">
                     <label>Detailed Description</label>
-                    <p>{{ $ticket->description }}</p>
+                    <p style="word-wrap: break-word;">{{ $ticket->description }}</p>
                 </div>
 
                 <div class="inline-elements">

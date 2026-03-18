@@ -12,8 +12,6 @@
 
 @section('content')
     @include('layout.nav')
-
-
     <!-- Main Content -->
     <main class="main-content">
         <header class="page-header">
@@ -58,11 +56,11 @@
                     <tr>
                         <th style="width: 5%">ID</th>
                         <th style="width: 20%">Project name</th>
-                        <th  style="width: 20%">Owner</th>
+                        <th style="width: 20%">Owner</th>
                         <th>Status</th>
                         <th>Progress</th>
                         <th>Creation date</th>
-                        <th>Actions</th>
+                        <th style="text-align: center">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -75,8 +73,12 @@
                             <td data-label="Project name" class="text-cell"><strong>{{ $project->name }}</strong></td>
                             <td data-label="Client" class="text-cell">
                                 <div class="user-profile-inline">
-                                    <img src="{{ $owner->profile_pic ? Storage::url($owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" >
-                                    <span style="margin-left: var(--spacing-sm)">{{ $owner->first_name.' '.$owner->last_name}}</span>
+                                    @if($owner)
+                                        <img src="{{ $owner->profile_pic ? Storage::url($owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" >
+                                        <span style="margin-left: var(--spacing-sm)">{{ $owner->first_name.' '.$owner->last_name}}</span>
+                                    @else
+                                        <span style="margin-left: var(--spacing-sm)">no owner found</span>
+                                    @endif
                                 </div>
                             </td>
                             <td data-label="Status">
@@ -92,14 +94,9 @@
                             </td>
                             <td data-label="Creation date">{{ optional($project->created_at)->format('Y-m-d') }}</td>
                             <td data-label="Actions">
-                                <div style="display: flex; justify-content: space-evenly">
+                                <div style="display: flex; justify-content: space-evenly; font-size: var(--font-size-xl);">
                                     <a href="{{ route('projects.project-details', $project->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                    <button type="button" class="icon btn-delete-project"
-                                            data-project-id="{{ $project->id }}"
-                                            data-project-name="{{ $project->name }}"
-                                            style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
+                                    <a href="{{ route('projects.project-edit', $project->id) }}" class="icon"><i class="fa-solid fa-pen-to-square"></i></a>
                                 </div>
                             </td>
                         </tr>
@@ -120,37 +117,11 @@
 @endsection
 
 @section('modal')
-    {{-- Delete project modal --}}
-    <dialog id="delete-modal" class="modal-container">
-        <h2>Delete project</h2>
-        <p style="margin-bottom: 1rem; color: var(--text-secondary);"> You are about to delete <strong id="modal-project-name"></strong> </p>
-        <p style="margin-bottom: 1rem; color: var(--text-secondary);text-align: center">This action is irreversible. </p>
-        <form method="POST" action="#" id="delete-form">
-            @csrf
-            @method('DELETE')
-            <div class="inline-elements">
-                <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
-                <button type="submit" class="btn btn--danger">Confirm deletion</button>
-            </div>
-        </form>
-    </dialog>
 @endsection
 
 @section('js_page')
     <script type="module">
         import { TableManager } from "{{ asset("utils/js/table-handler.js") }}";
         new TableManager('#table', 5);
-
-        const modal     = document.getElementById('delete-modal');
-        const form      = document.getElementById('delete-form');
-        const modalName = document.getElementById('modal-project-name');
-
-        document.querySelectorAll('.btn-delete-project').forEach(btn => {
-            btn.addEventListener('click', () => {
-                modalName.textContent = btn.dataset.projectName;
-                form.action = "{{ route('projects.project-destroy', '__ID__') }}".replace('__ID__', btn.dataset.projectId);
-                modal.showModal();
-            });
-        });
     </script>
 @endsection
