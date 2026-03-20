@@ -81,7 +81,7 @@
                         <th>Priority</th>
                         <th>Type</th>
                         <th>Assigned</th>
-                        <th>Actions</th>
+                        <th style="text-align: center;">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -97,21 +97,18 @@
                         <td data-label="Type"><span class="badge @php setBadgeColor($ticket->type) @endphp">{{ $ticket->type }}</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                @foreach($ticket->workers as $worker)
-                                    <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->first_name. ' ' .$worker->last_name }}" alt="profile-picture" class="profile-pic-mini">
+                                @foreach($ticket->workers->take(3) as $worker)
+                                    <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->full_name }}" alt="profile-picture" class="profile-pic-mini">
                                 @endforeach
+                                @if($ticket->workers->count() > 3)
+                                    <span class="profile-pic-more" title="{{ $ticket->workers->count() - 3 }} more">...</span>
+                                @endif
                             </div>
                         </td>
                         <td data-label="Actions">
                             <div style="display: flex; justify-content: space-evenly; font-size: var(--font-size-xl);">
                                 <a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
-                                <button type="button" class="icon btn-delete-project"
-                                        data-ticket-id="{{ $ticket->id }}"
-                                        data-ticket-name="{{ $ticket->name }}"
-                                        style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
+                                <a href="{{ route('tickets.ticket-edit', $ticket->id) }}" class="icon"><i class="fa-solid fa-pen-to-square"></i></a>
                             </div>
                         </td>
                     </tr>
@@ -132,20 +129,6 @@
 @endsection
 
 @section('modal')
-    {{-- Delete ticket modal --}}
-    <dialog id="delete-modal" class="modal-container">
-        <h2>Delete ticket</h2>
-        <p style="margin-bottom: 1rem; color: var(--text-secondary);"> You are about to delete <strong id="modal-project-name"></strong> </p>
-        <p style="margin-bottom: 1rem; color: var(--text-secondary);text-align: center">This action is irreversible. </p>
-        <form method="POST" action="{{ route("profile-delete") }}" id="delete-form">
-            @csrf
-            @method('DELETE')
-            <div class="inline-elements">
-                <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
-                <button type="submit" class="btn btn--danger">Confirm deletion</button>
-            </div>
-        </form>
-    </dialog>
 @endsection
 
 @section('js_page')

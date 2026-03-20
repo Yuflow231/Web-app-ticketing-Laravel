@@ -64,6 +64,7 @@ td.text-cell {
     border-radius: var(--radius-full);
     border: 2px solid var(--primary-color);
     object-fit: cover;
+    aspect-ratio: 1;
 }
 
 

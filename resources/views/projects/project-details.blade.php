@@ -62,7 +62,6 @@
 
                 <div class="inline-elements" style="margin-top: auto; padding-top: 1rem;">
                     <button class="btn" onclick="location.href = '{{ route('projects.project-edit', $project->id) }}' ">Edit Project</button>
-                    <button class="btn btn--danger">Close Project</button>
                 </div>
             </section>
 
@@ -70,18 +69,29 @@
                 <section class="detail-card">
                     <h2>Project Team</h2>
                     <div id="collaborator-list">
-                        @foreach($project->teamMembers as $member)
-                            <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
-                                <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
+                        @foreach($project->teamMembers->take(3) as $member)
+                            <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
+                                <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
                                 <div class="item-stacked" style="margin-left: var(--spacing-sm);">
                                     <div>
-                                        <span class="username" data-type="first-name">{{ $member->first_name }}</span>
-                                        <span class="username" data-type="last-name">{{ $member->last_name }}</span>
+                                        <span class="username" data-type="full-name">{{ $member->full_name }}</span>
                                     </div>
                                     <span class="user-role">{{ $member->pivot->role }}</span>
                                 </div>
                             </div>
                         @endforeach
+
+                        @if($project->teamMembers->count() > 3)
+                            <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm); cursor: pointer; background: #f3f4f6; border-radius: var(--radius-md); padding: var(--spacing-sm); transition: all 0.2s;" onclick="document.getElementById('team-display').showModal()">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: var(--font-size-sm);">
+                                    +{{ $project->teamMembers->count() - 3 }}
+                                </div>
+                                <div class="item-stacked" style="margin-left: var(--spacing-sm); flex: 1;">
+                                    <span class="user-role" style="color: var(--text-secondary); font-size: var(--font-size-sm);">Click to view all {{ $project->teamMembers->count() }} team members</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); margin-left: auto;"></i>
+                            </div>
+                        @endif
                     </div>
                 </section>
 
@@ -122,11 +132,11 @@
                         <thead>
                         <tr>
                             <th style="width: 5%">ID</th>
-                            <th style="width: 40%">Ticket Title</th>
+                            <th style="width: 35%">Ticket Title</th>
                             <th>Status</th>
                             <th>Priority</th>
                             <th>Type</th>
-                            <th>Action</th>
+                            <th style="text-align: center;">Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -137,7 +147,11 @@
                                 <td data-label="Status"><span class="badge @php setBadgeColor($ticket->status) @endphp">{{ $ticket->status }}</span></td>
                                 <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{ $ticket->priority }}</span></td>
                                 <td data-label="Type"><span class="badge @php setBadgeColor($ticket->type) @endphp">{{ $ticket->type }}</span></td>
-                                <td data-label="Action"><a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                                <td data-label="Action">
+                                    <div style="display: flex; justify-content: center;">
+                                        <a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon" style="font-size: var(--font-size-xl);"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -168,6 +182,46 @@
     </main>
 @endsection
 
+@section('modal')
+    @if($project->teamMembers->count() > 3)
+    {{-- Modal to display the entire team --}}
+        <dialog id="team-display" class="modal-container">
+            <div style="display: flex; justify-content: space-between">
+                <h2 style="margin-bottom: 0.5rem;">Project's team</h2>
+                <button type="button" class="icon" onclick="document.getElementById('team-display').close()" style="font-size: 1.5rem; color: var(--text-secondary);">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            {{-- Search bar --}}
+            <div class="form-item-stacked">
+                <input type="text" id="team-member-search" placeholder="Search by name or email...">
+            </div>
+
+            {{-- User list --}}
+            <div id="team-list" class="modal-list">
+                @foreach($project->teamMembers as $member)
+                    <div class="modal-list-selectable team-member-list" data-user-name="{{ $member->full_name }}" data-user-email="{{ $member->email }}">
+                        <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic-mini" alt="profile-pic">
+                        <div style="flex: 1;">
+                            <div class="modal-list-name">{{ $member->full_name }}</div>
+                            <div class="modal-list-subname">{{ $member->email }}</div>
+                        </div>
+                        @if($member->isAdmin())
+                            <span class="badge blue">Admin</span>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            <div style="margin-top: 1rem; display: flex; justify-content: center;">
+                <button type="button" class="btn btn--outline" onclick="document.getElementById('team-display').close()">
+                    Cancel
+                </button>
+            </div>
+        </dialog>
+    @endif
+@endsection
 
 @section('js_page')
     <script type="module">
@@ -175,5 +229,26 @@
 
         // Initialize for the linked tickets table (using correct selector)
         new TableManager('#table', 5);
+
+        @if($project->teamMembers()->count() > 3)
+        // Team Search
+        const teamSearch = document.getElementById('team-member-search');
+        const teamItems = document.querySelectorAll('.team-member-list');
+
+        teamSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            teamItems.forEach(item => {
+                const name = item.dataset.userName.toLowerCase();
+                const email = item.dataset.userEmail.toLowerCase();
+
+                if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        @endif
     </script>
 @endsection

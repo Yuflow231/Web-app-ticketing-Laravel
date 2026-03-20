@@ -69,6 +69,7 @@
     object-fit: cover;
     border: 2px solid var(--primary-color);
     transition: var(--transition-normal);
+    aspect-ratio: 1;
 }
 
 .user-profile-header:hover .profile-pic {

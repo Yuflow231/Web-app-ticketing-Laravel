@@ -117,17 +117,4 @@ class Ticket extends Model
         return $query->where('type', 'Billed');
     }
 
-    /**
-     * Update the spent time on parent project
-     */
-    protected static function booted()
-    {
-        static::saved(function ($ticket) {
-            $ticket->project->calculateSpentTime();
-        });
-
-        static::deleted(function ($ticket) {
-            $ticket->project->calculateSpentTime();
-        });
-    }
 }

@@ -117,6 +117,8 @@ class TicketsController extends Controller
             }
         }
 
+        $ticket->project->calculatePercent();
+
         return redirect()->route('tickets.ticket-details', $ticket->id)
             ->with('success', 'Ticket created successfully.');
     }
@@ -156,11 +158,11 @@ class TicketsController extends Controller
     /**
      * Show the edit form
      */
-    public function edit(Ticket $ticket)
+    public function showEdit(int $id)
     {
         $projects = Project::all();
         $users = User::all();
-        $ticket->load(['workers', 'attachments']);
+        $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
 
         return view('tickets.ticket-edit', compact('ticket', 'projects', 'users'));
     }
@@ -168,8 +170,10 @@ class TicketsController extends Controller
     /**
      * Update the ticket
      */
-    public function update(Request $request, Ticket $ticket)
+    public function update(Request $request, int $id)
     {
+        $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
+
         $validated = $request->validate([
             'name' => 'required|string|max:150',
             'project_id' => 'required|exists:projects,id',
@@ -188,13 +192,32 @@ class TicketsController extends Controller
         $ticket->update($validated);
 
         // Update the workers
-        if ($request->has('workers')) {
+        if ($request->has('workers') && is_array($request->workers) && count($request->workers) > 0) {
             $syncData = [];
             foreach ($request->workers as $index => $userId) {
                 $role = $request->worker_roles[$index] ?? '';
                 $syncData[$userId] = ['role' => $role];
             }
             $ticket->workers()->sync($syncData);
+        } else {
+            // Detach all workers if none selected
+            $ticket->workers()->detach();
+        }
+
+        // Delete marked attachments
+        if ($request->has('delete_attachments') && is_array($request->delete_attachments)) {
+            foreach ($request->delete_attachments as $attachmentId) {
+                $attachment = TicketAttachment::where('id', $attachmentId)
+                    ->where('ticket_id', $ticket->id)  // Security: verify it belongs to this ticket
+                    ->first();
+
+                if ($attachment) {
+                    // Delete file from storage
+                    Storage::disk('public')->delete($attachment->file_name);
+                    // Delete record from database
+                    $attachment->delete();
+                }
+            }
         }
 
         // Handle the new attachments — store with readable name, save full path in DB
@@ -223,7 +246,12 @@ class TicketsController extends Controller
             }
         }
 
-        return redirect()->route('tickets.ticket-details', $ticket->id)
+        // CRITICAL: Update parent project's times based on ALL tickets
+        $ticket->project->calculateSpentTime();
+        $ticket->project->calculateEstimatedTime();
+        $ticket->project->calculatePercent();
+
+        return redirect()->route('tickets.ticket-edit', $ticket->id)
             ->with('success', 'Ticket updated successfully.');
     }
 
@@ -243,17 +271,5 @@ class TicketsController extends Controller
 
         return redirect()->route('tickets.tickets')
             ->with('success', 'Ticket deleted successfully.');
-    }
-
-    /**
-     * Delete an attachment
-     */
-    public function deleteAttachment(TicketAttachment $attachment)
-    {
-        // file_name already contains the full path e.g. "attachments/fileName.ext"
-        Storage::disk('public')->delete($attachment->file_name);
-        $attachment->delete();
-
-        return back()->with('success', 'Attachment deleted successfully.');
     }
 }

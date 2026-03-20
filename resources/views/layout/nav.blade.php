@@ -24,8 +24,7 @@ function laink($route): void {
         </div>
         <div class="user-profile-header">
             <a href="{{ route("profile") }}" class="user-profile-inline">
-                <span class="username" data-type="first-name"> {{ auth()->user()->first_name }} </span>
-                <span class="username" data-type="last-name"> {{ auth()->user()->last_name }} </span>
+                <span class="username" data-type="first-name"> {{ auth()->user()->full_name }} </span>
 
                 <!-- <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" > -->
                 <img src="{{ !empty(auth()->user()->profile_pic) ? Storage::url(auth()->user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">

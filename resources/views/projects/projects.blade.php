@@ -75,7 +75,7 @@
                                 <div class="user-profile-inline">
                                     @if($owner)
                                         <img src="{{ $owner->profile_pic ? Storage::url($owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" >
-                                        <span style="margin-left: var(--spacing-sm)">{{ $owner->first_name.' '.$owner->last_name}}</span>
+                                        <span style="margin-left: var(--spacing-sm)">{{ $owner->full_name}}</span>
                                     @else
                                         <span style="margin-left: var(--spacing-sm)">no owner found</span>
                                     @endif

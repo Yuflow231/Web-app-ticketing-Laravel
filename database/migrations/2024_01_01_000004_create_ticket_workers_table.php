@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('role', ['Ticket Creator', 'Helper', ''])->default('');
+            $table->enum('role', ['Ticket Creator', 'Developer', 'Tester', 'Reviewer', 'Designer', 'Helper', ''])->default('');
             $table->timestamps();
-            
+
             // Empêcher les doublons
             $table->unique(['ticket_id', 'user_id']);
         });

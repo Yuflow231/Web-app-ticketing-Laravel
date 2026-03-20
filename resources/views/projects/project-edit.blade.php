@@ -123,7 +123,7 @@
                                 <div style="background: #f9fafb; border: 1px solid #ddd; border-radius: var(--radius-md); padding: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
                                     <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
                                         <div style="flex: 1; min-width: 0;">
-                                            <p style="font-weight: 600; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <p style="font-weight: bold; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                 {{ basename($project->contract) }}
                                             </p>
                                         </div>
@@ -178,7 +178,6 @@
                             </p>
                         </div>
                     </section>
-
                 </div>
 
 
@@ -267,8 +266,7 @@
         <div id="users-list" class="modal-list">
             @foreach($users as $user)
                 <div class="modal-list-selectable team-member-item" data-user-id="{{ $user->id }}" data-user-name="{{ $user->full_name }}" data-user-email="{{ $user->email }}" data-user-avatar="{{ $user->profile_pic ? Storage::url($user->profile_pic) : asset('assets/images/icon.png') }}" onclick="toggleTeamMember(this)">
-                    <input type="checkbox" class="team-checkbox" name="team_members[]" style="margin-right: var(--spacing-sm); cursor: pointer;"
-                           value="{{ $user->id }}" {{ $project->teamMembers->contains($user->id) ? 'checked' : '' }}>
+                    <input type="checkbox" class="team-checkbox" name="team_members[]" style="margin-right: var(--spacing-sm); cursor: pointer; width: 1rem; height: 1rem;" value="{{ $user->id }}" {{ $project->teamMembers->contains($user->id) ? 'checked' : '' }}>
 
                     <img src="{{ $user->profile_pic ? Storage::url($user->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic-mini" alt="profile-pic">
 

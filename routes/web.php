@@ -59,9 +59,9 @@ Route::middleware('auth')->group(function () {
     // Tickets - Routes
     Route::get('/tickets', [TicketsController::class, 'index'])->name('tickets.tickets');
     Route::get('/ticket-creation', [TicketsController::class, 'showCreate'])->name('tickets.ticket-creation');
+    Route::get('/ticket-edit/{id}', [TicketsController::class, 'showEdit'])->name('tickets.ticket-edit');
+    Route::put('/ticket-update/{id}', [TicketsController::class, 'update'])->name('tickets.ticket-update');
     Route::get('/ticket-details/{id}', [TicketsController::class, 'details'])->name('tickets.ticket-details');
     Route::post('/ticket-store', [TicketsController::class, 'store'])->name('tickets.ticket-store');
     Route::delete('/ticket-destroy/{id}', [TicketsController::class, 'destroy'])->name('tickets.ticket-destroy');
-
-    Route::delete('/attachments/{attachment}', [TicketsController::class, 'deleteAttachment'])->name('attachments.destroy');
 });

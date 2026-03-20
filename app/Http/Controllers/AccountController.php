@@ -242,18 +242,10 @@ class AccountController extends Controller
                 ->where('users.id', '!=', $user->id)
                 ->get();
 
-            if ($remainingMembers->isEmpty()) {
-                // No one left => delete the project and its contract
-                if (!empty($ownedProject->contract) && Storage::disk('public')->exists($ownedProject->contract)) {
-                    Storage::disk('public')->delete($ownedProject->contract);
-                }
-                $ownedProject->delete();
-            } else {
+            if (!$remainingMembers->isEmpty()) {
                 $firstMember = $remainingMembers->first();
-
                 // Detach deleted user first
                 $ownedProject->teamMembers()->detach($user->id);
-
                 // Promote new owner in pivot
                 $ownedProject->teamMembers()->updateExistingPivot($firstMember->id, [
                     'role' => 'Owner',

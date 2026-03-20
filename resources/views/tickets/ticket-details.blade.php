@@ -47,8 +47,7 @@
                 </div>
 
                 <div class="inline-elements" style="margin-top: auto; padding-top: 1rem;">
-                    <button class="btn">Edit Ticket</button>
-                    <button class="btn btn--danger">Close Ticket</button>
+                    <button class="btn" onclick="location.href = '{{ route("tickets.ticket-edit", $ticket->id) }}' ">Edit Ticket</button>
                 </div>
             </section>
 
@@ -72,25 +71,32 @@
                 <section class="detail-card">
                     <h2>Assigned Collaborators</h2>
                     <div id="collaborator-list">
-                        @foreach($ticket->workers as $worker)
+                        @foreach($ticket->workers->take(3) as $worker)
                             <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
                                 <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
                                 <div class="item-stacked" style="margin-left: var(--spacing-sm);">
                                     <div>
-                                        <span class="username" data-type="first-name">{{ $worker->first_name }}</span>
-                                        <span class="username" data-type="last-name">{{ $worker->last_name }}</span>
+                                        <span class="username" data-type="full-name">{{ $worker->full_name }}</span>
                                     </div>
-                                    <span class="user-role">{{ $worker->pivot->role }}</span>
+                                    <span class="user-role">{{ $worker->pivot->role ? $worker->pivot->role : "No role" }}</span>
                                 </div>
                             </div>
                         @endforeach
+                        @if($ticket->workers->count() > 3)
+                                <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm); cursor: pointer; background: #f3f4f6; border-radius: var(--radius-md); padding: var(--spacing-sm); transition: all 0.2s;" onclick="document.getElementById('team-display').showModal()">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: var(--font-size-sm);">+{{ $ticket->workers->count() - 3 }}</div>
+                                    <div class="item-stacked" style="margin-left: var(--spacing-sm); flex: 1;">
+                                        <span class="user-role" style="color: var(--text-secondary); font-size: var(--font-size-sm);">Click to view all {{ $ticket->workers->count() }} team members</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); margin-left: auto;"></i>
+                                </div>
+                        @endif
                     </div>
                 </section>
             </div>
 
             <div class="detail-card full-width">
                 <h2>Files associated</h2>
-                <button class="btn" style="margin-bottom: var(--spacing-sm)">Edit documents</button>
                 <ul id="file-list">
                     @if($ticket->attachments->isNotEmpty())
                         @foreach($ticket->attachments as $attachment)
@@ -111,4 +117,71 @@
             </div>
         </div>
     </main>
+@endsection
+
+
+@section('modal')
+    @if($ticket->workers->count() > 3)
+    {{-- Modal to display the entire team --}}
+        <dialog id="team-display" class="modal-container">
+            <div style="display: flex; justify-content: space-between">
+                <h2 style="margin-bottom: 0.5rem;">Ticket's team</h2>
+                <button type="button" class="icon" onclick="document.getElementById('team-display').close()" style="font-size: 1.5rem; color: var(--text-secondary);">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            {{-- Search bar --}}
+            <div class="form-item-stacked">
+                <input type="text" id="team-member-search" placeholder="Search by name or role...">
+            </div>
+
+            {{-- User list --}}
+            <div id="team-list" class="modal-list">
+                @foreach($ticket->workers as $member)
+                    <div class="modal-list-selectable team-member-list" data-user-name="{{ $member->full_name }}" data-user-role="{{ $member->pivot->role }}">
+                        <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic-mini" alt="profile-pic">
+                        <div style="flex: 1;">
+                            <div class="modal-list-name">{{ $member->full_name }}</div>
+                            <div class="modal-list-subname">{{ $member->pivot->role ? $member->pivot->role : "No role assigned" }}</div>
+                        </div>
+                        @if($member->isAdmin())
+                            <span class="badge blue">Admin</span>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            <div style="margin-top: 1rem; display: flex; justify-content: center;">
+                <button type="button" class="btn btn--outline" onclick="document.getElementById('team-display').close()">
+                    Cancel
+                </button>
+            </div>
+        </dialog>
+    @endif
+@endsection
+
+@section('js_page')
+    @if($ticket->workers->count() > 3)
+    <script type="module">
+        // Team Search
+        const teamSearch = document.getElementById('team-member-search');
+        const teamItems = document.querySelectorAll('.team-member-list');
+
+        teamSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            teamItems.forEach(item => {
+                const name = item.dataset.userName.toLowerCase();
+                const role = item.dataset.userRole.toLowerCase();
+
+                if (name.includes(searchTerm) || role.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    @endif
 @endsection

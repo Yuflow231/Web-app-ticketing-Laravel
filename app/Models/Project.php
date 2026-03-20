@@ -90,6 +90,37 @@ class Project extends Model
     }
 
     /**
+     * Calculate the total time spent throughout all the tickets
+     */
+    public function calculateEstimatedTime()
+    {
+        $this->estimated_time = $this->tickets()->sum('estimated_time');
+        $this->save();
+    }
+
+    /**
+     * Calculate the progression percentage depending on "completed" tickets
+     */
+    public function calculatePercent()
+    {
+        $totalTickets = $this->tickets()->count();
+
+        if ($totalTickets === 0) {
+            $this->progress_percent = 0;
+            $this->save();
+            return;
+        }
+
+        $completedTickets = $this->tickets()
+            ->where('status', 'Completed')
+            ->count();
+
+        $this->progress_percent = (int) round(($completedTickets / $totalTickets) * 100);
+        $this->save();
+    }
+
+
+    /**
      * Scope for active projects
      */
     public function scopeActive($query)
