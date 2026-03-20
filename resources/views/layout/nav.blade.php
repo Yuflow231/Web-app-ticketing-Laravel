@@ -1,4 +1,5 @@
-<?php
+@php use Illuminate\Support\Facades\Storage; @endphp
+@php
 /**
  * Helper function to generate navigation links with proper active state and debug param
  * @param string $refLink The target URL
@@ -12,7 +13,8 @@ function laink($route): void {
     $refLink = route($route);
     echo "<a href='{$refLink}'{$activeClass}>";
 }
-?>
+@endphp
+
 
 <nav class="navigation">
     <header class="top-bar">
@@ -21,11 +23,11 @@ function laink($route): void {
             <span>| Ticketing App</span>
         </div>
         <div class="user-profile-header">
-            <a href="#" class="user-profile-inline">
-                <span class="username" data-type="first-name">Yuflow</span>
-                <span class="username" data-type="last-name">Furry</span>
+            <a href="{{ route("profile") }}" class="user-profile-inline">
+                <span class="username" data-type="first-name"> {{ auth()->user()->full_name }} </span>
 
-                <img src="{{ asset("utils/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
+                <!-- <img src="{{ asset("assets/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" > -->
+                <img src="{{ !empty(auth()->user()->profile_pic) ? Storage::url(auth()->user()->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
             </a>
         </div>
     </header>
@@ -33,27 +35,30 @@ function laink($route): void {
     <!-- Side Navigation Bar -->
     <div class="side-nav">
         <div class="top-side">
-            <?php laink('dashboard')?>
+            @php laink('dashboard')@endphp
             <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
             <span class="text">Dashboard</span>
             </a>
-            <?php laink('projects.projects')?>
+            @php laink('projects.projects') @endphp
             <span class="icon"><i class="fa-solid fa-diagram-project"></i></span>
             <span class="text">Projects</span>
             </a>
-            <?php laink('tickets.tickets')?>
+            @php laink('tickets.tickets')@endphp
             <span class="icon"><i class="fa-solid fa-ticket"></i></span>
             <span class="text">Tickets</span>
             </a>
-            <?php laink('profile')?>
+            @php laink('profile')@endphp
             <span class="icon"><i class="fa-solid fa-user"></i></span>
             <span class="text">Profile</span>
             </a>
         </div>
 
-        <a href="{{ route('login') }}">
-            <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
-            <span class="text">Logout</span>
-        </a>
-    </div>
+        <form id="logout" method="post" action="{{ route("logout") }}">
+        @csrf
+            <a href="javascript:{}" onclick="document.getElementById('logout').submit();">
+                <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+                <span class="text">Logout</span>
+            </a>
+        </form>
+</div>
 </nav>

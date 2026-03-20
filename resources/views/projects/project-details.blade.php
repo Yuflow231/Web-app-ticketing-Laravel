@@ -6,6 +6,8 @@
 
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
+    @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -13,7 +15,7 @@
     <!-- Main Content -->
     <main class="main-content">
         <header class="page-header">
-            <h1 id="project-title-header">Project: Skyblocker</h1>
+            <h1 id="project-title-header">Project: {{ $project->name }}</h1>
         </header>
 
         <div class="detail-container" id="project-data-container">
@@ -21,44 +23,45 @@
                 <div class="detail-item">
                     <label>ID</label>
                     <p id="project-id">
-                        #1
+                        {{ $project->id }}
                     </p>
                 </div>
                 <div class="inline-elements">
-                    <div class="detail-item">
+                    <div class="detail-item" style="text-align: center;">
                         <label>Status</label>
-                        <span class="badge green">In Progress</span>
+                        <span class="badge @php setBadgeColor($project->status) @endphp" style="text-align: center;">{{ $project->status }}</span>
                     </div>
-                    <div class="detail-item">
-                        <label>Closing date</label>
-                        <p id="closing-date">
-                            2026-03-24
-                        </p>
-                    </div>
+                    @if($project->closing_date)
+                        <div class="detail-item" style="text-align: center;">
+                            <label>Closing date</label>
+                            <p id="closing-date">
+                                {{ optional($project->closing_date)->format("Y-m-d") }}
+                            </p>
+                        </div>
+                    @endif
                 </div>
 
-                <div class="detail-item">
+                <div class="detail-item" style="max-width: 30rem;">
                     <label>Detailed Description</label>
-                    <p id="project-description">
-                        Create a minecraft mode that act as an add-on for the Hypixel server, more precisely for its Skyblock game mode. Its role is to enhance the game experience by providing quality of life improvement, as well as improving guidance.
+                    <p id="project-description" style="word-wrap: break-word;">
+                        {{ $project->description }}
                     </p>
                 </div>
 
                 <div class="inline-elements" style="margin-top: 2rem;">
-                    <div class="detail-item">
-                        <label>Actual Time Spent</label>
-                        <p id="actual-time" style="text-align: center">120.00 hours</p>
+                    <div class="detail-item" style="text-align: center;">
+                        <label>Time Spent</label>
+                        <p id="time-spent">{{ $project->spent_time }} hours</p>
                     </div>
-                    <div class="detail-item">
+                    <div class="detail-item" style="text-align: center;">
                         <label>Estimated Time</label>
-                        <p id="est-time" style="text-align: center">120.00 hours</p>
+                        <p id="estimated-time">{{ $project->estimated_time }} hours</p>
                     </div>
                 </div>
 
 
                 <div class="inline-elements" style="margin-top: auto; padding-top: 1rem;">
-                    <button class="btn">Edit Project</button>
-                    <button class="btn btn--danger">Close Project</button>
+                    <button class="btn" onclick="location.href = '{{ route('projects.project-edit', $project->id) }}' ">Edit Project</button>
                 </div>
             </section>
 
@@ -66,26 +69,29 @@
                 <section class="detail-card">
                     <h2>Project Team</h2>
                     <div id="collaborator-list">
-                        <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
-                            <img src="{{ asset("utils/images/yuflow.jpg") }}" alt="User Profile" class="profile-pic" >
-                            <div class="item-stacked" style="margin-left: var(--spacing-sm);">
-                                <div>
-                                    <span class="username" data-type="first-name">Yuflow2</span>
-                                    <span class="username" data-type="last-name">Furry</span>
+                        @foreach($project->teamMembers->take(3) as $member)
+                            <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
+                                <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
+                                <div class="item-stacked" style="margin-left: var(--spacing-sm);">
+                                    <div>
+                                        <span class="username" data-type="full-name">{{ $member->full_name }}</span>
+                                    </div>
+                                    <span class="user-role">{{ $member->pivot->role }}</span>
                                 </div>
-                                <span class="user-role">Maintainer</span>
                             </div>
-                        </div>
-                        <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
-                            <img src="{{ asset("utils/images/icon.png") }}" alt="User Profile" class="profile-pic" >
-                            <div class="item-stacked" style="margin-left: var(--spacing-sm);">
-                                <div>
-                                    <span class="username" data-type="first-name">Vic</span>
-                                    <span class="username" data-type="last-name">IsACat</span>
+                        @endforeach
+
+                        @if($project->teamMembers->count() > 3)
+                            <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm); cursor: pointer; background: #f3f4f6; border-radius: var(--radius-md); padding: var(--spacing-sm); transition: all 0.2s;" onclick="document.getElementById('team-display').showModal()">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: var(--font-size-sm);">
+                                    +{{ $project->teamMembers->count() - 3 }}
                                 </div>
-                                <span class="user-role">Owner</span>
+                                <div class="item-stacked" style="margin-left: var(--spacing-sm); flex: 1;">
+                                    <span class="user-role" style="color: var(--text-secondary); font-size: var(--font-size-sm);">Click to view all {{ $project->teamMembers->count() }} team members</span>
+                                </div>
+                                <i class="fa-solid fa-chevron-right" style="color: var(--text-secondary); margin-left: auto;"></i>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </section>
 
@@ -94,9 +100,9 @@
                     <div class="detail-item">
                         <label>Completion</label>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: 3%;"></div>
+                            <div class="progress-fill" style="width: {{ $project->progress_percent }}%;"></div>
                         </div>
-                        <p style="font-size: var(--font-size-sm); margin-top: var(--spacing-sm);">3% of ticket completion</p>
+                        <p style="font-size: var(--font-size-sm); margin-top: var(--spacing-sm);">{{ $project->progress_percent }}% of ticket completion</p>
                     </div>
                 </section>
             </div>
@@ -125,49 +131,97 @@
                     <table id="table" style="width: 100%; font-size: 0.9rem;">
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Ticket Title</th>
+                            <th style="width: 5%">ID</th>
+                            <th style="width: 35%">Ticket Title</th>
                             <th>Status</th>
                             <th>Priority</th>
                             <th>Type</th>
-                            <th>Action</th>
+                            <th style="text-align: center;">Action</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td data-label="ID">#1</td>
-                            <td data-label="Title"><strong>Customizable UI bars</strong></td>
-                            <td data-label="Status"><span class="badge green">In Progress</span></td>
-                            <td data-label="Priority"><span class="badge orange">Medium</span></td>
-                            <td data-label="Type"><span class="badge green">Included</span></td>
-                            <td data-label="Action"><a href="#" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
-                        </tr>
-
-                        <tr>
-                            <td data-label="ID">#3</td>
-                            <td data-label="Title"><strong>Implement Dark Mode</strong></td>
-                            <td data-label="Status"><span class="badge blue">New</span></td>
-                            <td data-label="Priority"><span class="badge green">Low</span></td>
-                            <td data-label="Type"><span class="badge red">Billed</span></td>
-                            <td data-label="Action"><a href="#" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
-                        </tr>
+                        @foreach($project->tickets as $ticket)
+                            <tr>
+                                <td data-label="ID">#{{ $ticket->id }}</td>
+                                <td data-label="Title" class="text-cell"><strong>{{ $ticket->name }}</strong></td>
+                                <td data-label="Status"><span class="badge @php setBadgeColor($ticket->status) @endphp">{{ $ticket->status }}</span></td>
+                                <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{ $ticket->priority }}</span></td>
+                                <td data-label="Type"><span class="badge @php setBadgeColor($ticket->type) @endphp">{{ $ticket->type }}</span></td>
+                                <td data-label="Action">
+                                    <div style="display: flex; justify-content: center;">
+                                        <a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon" style="font-size: var(--font-size-xl);"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <div class="detail-card full-width" id="file-list">
-                <h2>Files associated</h2>
-                <button class="btn" style="margin-bottom: var(--spacing-sm)">Edit documents</button>
-                <ul>
-                    <li>Business Contract</li>
-                    <li>User stories</li>
+            <div class="detail-card full-width">
+                <h2>Associated contract</h2>
+                <ul id="file-list"  style="list-style-type: none;">
+                    @if($project->contract)
+                        <li>
+                            <p class="file-name"> {{ basename($project->contract) }} </p>
+                            <div style="color: var(--primary-color); flex-shrink: 0;">
+                                <a href="{{ Storage::url($project->contract) }}" target="_blank" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                <a href="{{ Storage::url($project->contract) }}" download="{{ basename($project->contract) }}" class="icon"><i class="fa-solid fa-download"></i></a>
+                            </div>
+                        </li>
+                    @else
+                        <li>
+                            <p class="file-name">No contract associate</p>
+                        </li>
+                    @endif
+
                 </ul>
             </div>
         </div>
     </main>
 @endsection
 
+@section('modal')
+    @if($project->teamMembers->count() > 3)
+    {{-- Modal to display the entire team --}}
+        <dialog id="team-display" class="modal-container">
+            <div style="display: flex; justify-content: space-between">
+                <h2 style="margin-bottom: 0.5rem;">Project's team</h2>
+                <button type="button" class="icon" onclick="document.getElementById('team-display').close()" style="font-size: 1.5rem; color: var(--text-secondary);">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            {{-- Search bar --}}
+            <div class="form-item-stacked">
+                <input type="text" id="team-member-search" placeholder="Search by name or email...">
+            </div>
+
+            {{-- User list --}}
+            <div id="team-list" class="modal-list">
+                @foreach($project->teamMembers as $member)
+                    <div class="modal-list-selectable team-member-list" data-user-name="{{ $member->full_name }}" data-user-email="{{ $member->email }}">
+                        <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic-mini" alt="profile-pic">
+                        <div style="flex: 1;">
+                            <div class="modal-list-name">{{ $member->full_name }}</div>
+                            <div class="modal-list-subname">{{ $member->email }}</div>
+                        </div>
+                        @if($member->isAdmin())
+                            <span class="badge blue">Admin</span>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            <div style="margin-top: 1rem; display: flex; justify-content: center;">
+                <button type="button" class="btn btn--outline" onclick="document.getElementById('team-display').close()">
+                    Cancel
+                </button>
+            </div>
+        </dialog>
+    @endif
+@endsection
 
 @section('js_page')
     <script type="module">
@@ -175,5 +229,26 @@
 
         // Initialize for the linked tickets table (using correct selector)
         new TableManager('#table', 5);
+
+        @if($project->teamMembers()->count() > 3)
+        // Team Search
+        const teamSearch = document.getElementById('team-member-search');
+        const teamItems = document.querySelectorAll('.team-member-list');
+
+        teamSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            teamItems.forEach(item => {
+                const name = item.dataset.userName.toLowerCase();
+                const email = item.dataset.userEmail.toLowerCase();
+
+                if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        @endif
     </script>
 @endsection

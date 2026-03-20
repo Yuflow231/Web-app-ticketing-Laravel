@@ -112,6 +112,7 @@ section h2 {
 .detail-item {
     margin-bottom: var(--spacing-lg);
 }
+
 /*------------------------------*/
 /* Profile specific */
 .profile-header {
@@ -126,6 +127,7 @@ section h2 {
     font-size: var(--font-size-3xl);
 }
 
+#profile-form .profile-pic,
 .profile-header .profile-pic{
     width: 9rem;
     height: 9rem;
@@ -151,17 +153,18 @@ section h2 {
         width: 100%;
         padding: var(--spacing-md);
     }
-    
+
     .page-header-line {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .grid-content,
     .grid-stats {
         grid-template-columns: 1fr;
     }
 
+    #profile-form .profile-pic,
     .profile-header .profile-pic{
         width: 8rem;
         height: 8rem;

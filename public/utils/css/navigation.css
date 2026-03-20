@@ -69,6 +69,7 @@
     object-fit: cover;
     border: 2px solid var(--primary-color);
     transition: var(--transition-normal);
+    aspect-ratio: 1;
 }
 
 .user-profile-header:hover .profile-pic {
@@ -143,11 +144,11 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    
+
     .side-nav.open {
         transform: translateX(0);
     }
-    
+
     .side-nav.collapsed {
         transform: translateX(-100%);
     }

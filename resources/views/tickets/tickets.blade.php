@@ -6,10 +6,13 @@
 
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
+    @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
     @include('layout.nav')
+
     <!-- Main Content -->
     <main class="main-content">
         <header class="page-header">
@@ -71,63 +74,45 @@
                 <table id="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Project</th>
+                        <th style="width: 5%">ID</th>
+                        <th style="width: 15%">Title</th>
+                        <th style="width: 15%">Project</th>
                         <th>Status</th>
                         <th>Priority</th>
                         <th>Type</th>
                         <th>Assigned</th>
-                        <th>Actions</th>
+                        <th style="text-align: center;">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     <!-- Tickets will be loaded here -->
                     <!-- Ticket template -->
+                    @foreach($tickets->items() as $ticket)
                     <tr>
-                        <td data-label="ID">#1</td>
-                        <td data-label="Title"><strong> Customizable UI bars</strong></td>
-                        <td data-label="Project">Skyblocker</td>
-                        <td data-label="Status"><span class="badge green">In Progress</span></td>
-                        <td data-label="Priority"><span class="badge orange">Medium</span></td>
-                        <td data-label="Type"><span class="badge green">Included</span></td>
+                        <td data-label="ID">#{{ $ticket->id }}</td>
+                        <td data-label="Title" class="text-cell"><strong>{{ $ticket->name }}</strong></td>
+                        <td data-label="Project" class="text-cell">{{$ticket->project->name}}</td>
+                        <td data-label="Status"><span class="badge @php setBadgeColor($ticket->status) @endphp">{{ $ticket->status }}</span></td>
+                        <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{ $ticket->priority }}</span></td>
+                        <td data-label="Type"><span class="badge @php setBadgeColor($ticket->type) @endphp">{{ $ticket->type }}</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                <img src="{{ asset("utils/images/icon.png") }}" title="Vic IsACat" alt="profile_pic" class="profile-pic-mini">
+                                @foreach($ticket->workers->take(3) as $worker)
+                                    <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->full_name }}" alt="profile-picture" class="profile-pic-mini">
+                                @endforeach
+                                @if($ticket->workers->count() > 3)
+                                    <span class="profile-pic-more" title="{{ $ticket->workers->count() - 3 }} more">...</span>
+                                @endif
                             </div>
                         </td>
                         <td data-label="Actions">
-                            <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
-                                <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
+                            <div style="display: flex; justify-content: space-evenly; font-size: var(--font-size-xl);">
+                                <a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                <a href="{{ route('tickets.ticket-edit', $ticket->id) }}" class="icon"><i class="fa-solid fa-pen-to-square"></i></a>
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td data-label="ID">#3</td>
-                        <td data-label="Title"><strong>Implement Dark Mode</strong></td>
-                        <td data-label="Project">Skyblocker</td>
-                        <td data-label="Status"><span class="badge blue">New</span></td>
-                        <td data-label="Priority"><span class="badge green">Low</span></td>
-                        <td data-label="Type"><span class="badge red">Billed</span></td>
-                        <td data-label="Assigned">
-                            <div class="avatar-line">
-                                <img src="{{ asset("utils/images/icon.png") }}" title="Vic IsACat" alt="profile_pic" class="profile-pic-mini">
-                            </div>
-                        </td>
-                        <td data-label="Actions">
-                            <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route("tickets.ticket-details") }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-
-                                <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    @endforeach
                     </tbody>
                 </table>
             </div>
@@ -143,11 +128,24 @@
     </main>
 @endsection
 
+@section('modal')
+@endsection
+
 @section('js_page')
     <script type="module">
         import { TableManager } from "{{ asset("utils/js/table-handler.js") }}";
-
-        // Initialize for tickets table
         new TableManager('#table', 5);
+
+        const modal     = document.getElementById('delete-modal');
+        const form      = document.getElementById('delete-form');
+        const modalName = document.getElementById('modal-project-name');
+
+        document.querySelectorAll('.btn-delete-project').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalName.textContent = btn.dataset.ticketName;
+                form.action = "{{ route('tickets.ticket-destroy', '__ID__') }}".replace('__ID__', btn.dataset.ticketId);
+                modal.showModal();
+            });
+        });
     </script>
 @endsection

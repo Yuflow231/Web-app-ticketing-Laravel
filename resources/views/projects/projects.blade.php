@@ -6,6 +6,8 @@
 
 @section('resources')
     <script src="{{ asset("utils/js/side-bar.js") }}" defer></script>
+    @php {{ require_once public_path("utils/php/badge-color-assigner.php"); }} @endphp
+    @php use Illuminate\Support\Facades\Storage; @endphp
 @endsection
 
 @section('content')
@@ -52,74 +54,53 @@
                 <table id="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Project name</th>
-                        <th>Owner</th>
+                        <th style="width: 5%">ID</th>
+                        <th style="width: 20%">Project name</th>
+                        <th style="width: 20%">Owner</th>
                         <th>Status</th>
                         <th>Progress</th>
                         <th>Creation date</th>
-                        <th>Actions</th>
+                        <th style="text-align: center">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     <!-- Projects will be loaded here -->
                     <!-- Project template -->
-                    <tr>
-                        <td data-label="ID">#1</td>
-                        <td data-label="Project name"><strong>Skyblocker</strong></td>
-                        <td data-label="Client">
-                            <div class="user-profile-inline">
-                                <img src="{{ asset("utils/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
-                                <span style="margin-left: var(--spacing-sm)">VicIsACat</span>
-                            </div>
-                        </td>
-                        <td data-label="Status">
-                            <span class="badge green">In Progress</span>
-                        </td>
-                        <td data-label="Progress">
-                            <div class="progress-container">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 3%;"></div>
+                    @foreach($projects->items() as $project)
+                        @php $owner = $project->owner->first(); @endphp
+                        <tr>
+                            <td data-label="ID">#{{ $project->id }}</td>
+                            <td data-label="Project name" class="text-cell"><strong>{{ $project->name }}</strong></td>
+                            <td data-label="Client" class="text-cell">
+                                <div class="user-profile-inline">
+                                    @if($owner)
+                                        <img src="{{ $owner->profile_pic ? Storage::url($owner->profile_pic) : asset('assets/images/icon.png') }}" class="profile-pic" alt="profile-picture" >
+                                        <span style="margin-left: var(--spacing-sm)">{{ $owner->full_name}}</span>
+                                    @else
+                                        <span style="margin-left: var(--spacing-sm)">no owner found</span>
+                                    @endif
                                 </div>
-                                <div class="progress-percentage">3%</div>
-                            </div>
-                        </td>
-                        <td data-label="Creation date">1996-02-02</td>
-                        <td data-label="Actions">
-                            <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route('projects.project-details') }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;"> <i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-label="ID">#2</td>
-                        <td data-label="Project name"><strong>Skyblocker</strong></td>
-                        <td data-label="Client">
-                            <div class="user-profile-inline">
-                                <img src="{{ asset("utils/images/icon.png") }}" class="profile-pic" alt="profile-picture" style="width:40px; height:40px;">
-                                <span style="margin-left: var(--spacing-sm)">VicIsACat</span>
-                            </div>
-                        </td>
-                        <td data-label="Status">
-                            <span class="badge green">In Progress</span>
-                        </td>
-                        <td data-label="Progress">
-                            <div class="progress-container">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 3%;"></div>
+                            </td>
+                            <td data-label="Status">
+                                <span class="badge @php setBadgeColor($project->status) @endphp">{{ $project->status }}</span>
+                            </td>
+                            <td data-label="Progress">
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ $project->progress_percent }}%;"></div>
+                                    </div>
+                                    <div class="progress-percentage">{{ $project->progress_percent }}%</div>
                                 </div>
-                                <div class="progress-percentage">3%</div>
-                            </div>
-                        </td>
-                        <td data-label="Creation date">1996-02-02</td>
-                        <td data-label="Actions">
-                            <div style="display: flex; justify-content: space-evenly">
-                                <a href="{{ route('projects.project-details') }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                <button type="submit" class="icon" style="color: var(--danger-color); background: none; border: none; cursor: pointer;"> <i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                            <td data-label="Creation date">{{ optional($project->created_at)->format('Y-m-d') }}</td>
+                            <td data-label="Actions">
+                                <div style="display: flex; justify-content: space-evenly; font-size: var(--font-size-xl);">
+                                    <a href="{{ route('projects.project-details', $project->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="{{ route('projects.project-edit', $project->id) }}" class="icon"><i class="fa-solid fa-pen-to-square"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
                     </tbody>
                 </table>
             </div>
@@ -135,11 +116,12 @@
     </main>
 @endsection
 
+@section('modal')
+@endsection
+
 @section('js_page')
     <script type="module">
         import { TableManager } from "{{ asset("utils/js/table-handler.js") }}";
-
-        // Initialize for projects table
         new TableManager('#table', 5);
     </script>
 @endsection

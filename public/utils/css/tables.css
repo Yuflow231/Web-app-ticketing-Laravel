@@ -2,6 +2,7 @@
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 thead {
@@ -30,7 +31,8 @@ tr:hover {
 
 td {
     padding: var(--spacing-md);
-    border-bottom: 1px solid #dee2e6;
+    margin:0;
+    font-weight:500;
 }
 
 table a{
@@ -41,17 +43,28 @@ table a:hover{
     color: var(--primary-hover);
 }
 
+tbody tr:nth-child(even) {
+    background-color: #f0f0f0;
+}
+
+td.text-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .avatar-line{
     display: flex;
     gap: var(--spacing-xs);
 }
 
 .profile-pic-mini {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     border-radius: var(--radius-full);
     border: 2px solid var(--primary-color);
     object-fit: cover;
+    aspect-ratio: 1;
 }
 
 
@@ -88,6 +101,7 @@ table a:hover{
     border: 1px solid var(--bg-main);
     border-radius: var(--radius-sm);
 }
+
 
 /* Responsive */
 @media only screen and (max-width: 768px) {
@@ -148,4 +162,9 @@ table a:hover{
         font-size: var(--font-size-sm);
         text-transform: uppercase;
     }
+
+    td.text-cell {
+        width:100%;
+    }
+
 }

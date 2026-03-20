@@ -10,6 +10,8 @@
 .form-item,
 .form-item-stacked {
     margin-bottom: var(--spacing-lg);
+    flex: 1;
+    flex-wrap: wrap;
 }
 
 .form-item-stacked label {
@@ -43,7 +45,7 @@ textarea:focus {
 }
 
 .form-2elements {
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing-lg);
 }
@@ -111,6 +113,15 @@ textarea {
     margin-bottom: var(--spacing-sm);
 }
 
+.file-name {
+    margin: 0;
+    width: 25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
 .removeBtn {
     color: var(--danger-color);
     cursor: pointer;
@@ -137,7 +148,6 @@ textarea {
     color: #666;
 }
 
-
 input[type="checkbox"] {
     appearance: none;
     width: 5px;
@@ -153,4 +163,17 @@ input[type="checkbox"]:checked {
     border-color: var(--primary-color);
     content: '✓';
     color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .file-name{
+        width: 20rem;
+    }
 }
