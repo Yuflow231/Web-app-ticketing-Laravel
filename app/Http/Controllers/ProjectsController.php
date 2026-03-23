@@ -20,10 +20,8 @@ class ProjectsController extends Controller
 
         $query = Project::with(['teamMembers', 'tickets', 'owner']);
 
-        if (!$user || !$user->isAdmin()) {
-            $query->whereHas('teamMembers', function ($q) use ($user) {
-                $q->where('users.id', $user?->id);
-            });
+        if (!$user->isAdmin()) {
+            $query->whereRelation('teamMembers', 'users.id', $user->id);
         }
 
         $projects = $query->latest()->paginate(15);
@@ -148,6 +146,14 @@ class ProjectsController extends Controller
         if (!$project) {
             return redirect()->route('projects.projects')
                 ->with('info', 'Project not found or no longer exists.');
+        }
+
+        $isMember = $project->teamMembers()->where('users.id', Auth::user()->id)->exists();
+        $isAdmin = Auth::user()->isAdmin();
+
+        if ( !$isMember && !$isAdmin ) {
+            return redirect()->route('projects.projects')
+                ->with('error', 'You are not allowed to access this project.');
         }
 
 

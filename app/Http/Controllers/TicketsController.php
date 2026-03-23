@@ -22,10 +22,8 @@ class TicketsController extends Controller
 
         $query = Ticket::with(['project', 'workers']);
 
-        if (!$user || !$user->isAdmin()) {
-            $query->whereHas('workers', function ($q) use ($user) {
-                $q->where('users.id', $user?->id);
-            });
+        if (!$user->isAdmin()) {
+            $query->whereRelation('workers', 'users.id', $user->id);
         }
 
         $tickets = $query->latest()->paginate(15);
@@ -130,26 +128,18 @@ class TicketsController extends Controller
     {
         $user = Auth::user();
 
-        // Fail-safe: unauthenticated user
-        if (!$user) {
-            return redirect()->route('login')
-                ->with('info', 'Please sign in to access ticket details.');
-        }
-
         $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
-
-        // Fail-safe: ticket deleted or invalid id
         if (!$ticket) {
             return redirect()->route('tickets.tickets')
                 ->with('info', 'Ticket not found or no longer exists.');
         }
 
-        $isMember = $ticket->project->teamMembers()->where('users.id', $user->id)->exists();
+        $isMember = $ticket->workers()->where('users.id', $user->id)->exists();
         $isAdmin = $user->isAdmin();
 
-        if (!$isMember && !$isAdmin) {
+        if ( !$isMember && !$isAdmin ) {
             return redirect()->route('tickets.tickets')
-                ->with('info', 'Access denied.');
+                ->with('error', 'Access denied.');
         }
 
         return view('tickets.ticket-details', compact('ticket'));
@@ -162,7 +152,22 @@ class TicketsController extends Controller
     {
         $projects = Project::all();
         $users = User::all();
+
+
         $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
+        if (!$ticket) {
+            return redirect()->route('tickets.tickets')
+                ->with('info', 'Ticket not found or no longer exists.');
+        }
+
+        $isMember = $ticket->workers()->where('users.id', Auth::user()->id)->exists();
+        $isAdmin = Auth::user()->isAdmin();
+
+        if ( !$isMember && !$isAdmin ) {
+            return redirect()->route('tickets.tickets')
+                ->with('error', 'Access denied.');
+        }
+
 
         return view('tickets.ticket-edit', compact('ticket', 'projects', 'users'));
     }
@@ -261,6 +266,7 @@ class TicketsController extends Controller
     public function destroy(int $id)
     {
         $ticket = Ticket::findOrFail($id);
+        $project = $ticket->project;
 
         foreach ($ticket->attachments as $attachment) {
             Storage::disk('public')->delete($attachment->file_name);
@@ -268,6 +274,11 @@ class TicketsController extends Controller
         }
 
         $ticket->delete();
+
+        // CRITICAL: Update parent project's times based on ALL tickets
+        $project->calculateSpentTime();
+        $project->calculateEstimatedTime();
+        $project->calculatePercent();
 
         return redirect()->route('tickets.tickets')
             ->with('success', 'Ticket deleted successfully.');

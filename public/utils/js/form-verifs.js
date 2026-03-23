@@ -74,7 +74,7 @@ export function verifyEmptyness(error) {
 
 export function verifyLength(error) {
     return{
-        predicate : (input) => input.value.length < 10,
+        predicate : (input) => input.value.length < 8,
         message : error,
     }
 }

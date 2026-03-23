@@ -128,10 +128,10 @@
                         <div class="detail-item">
                             <label>Password</label>
                             <p style="margin-bottom: 1rem;">••••••••••••</p>
-                            <a href="{{ route('reset-password') }}" class="btn btn--outline" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                            <button onclick="document.getElementById('password-modal').showModal()" type="button" class="btn btn--outline" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
                                 <i class="fa-solid fa-key"></i>
                                 Change Password
-                            </a>
+                            </button>
                         </div>
                     </section>
 
@@ -173,14 +173,52 @@
                 <label for="delete-password">Password</label>
                 <div class="password-wrapper">
                     <input type="password" id="delete-password" name="password" required placeholder="Your current password">
-                    <span id="toggle-password" class="toggle-password">
-                            <i id="pass-icon" class="fa-solid fa-eye"></i>
-                        </span>
+                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
                 </div>
             </div>
             <div class="inline-elements">
                 <button type="button" class="btn btn--outline" onclick="document.getElementById('delete-modal').close()">Cancel</button>
                 <button type="submit" id="delete-action" class="btn btn--danger">Confirm deletion</button>
+            </div>
+        </form>
+    </dialog>
+
+    {{-- Update password modal --}}
+    <dialog id="password-modal" class="modal-container">
+        <div style="display: flex; justify-content: space-between;">
+            <h2 style="margin-bottom: 0.5rem;">Change password</h2>
+            <button type="button" class="icon" onclick="document.getElementById('password-modal').close()" style="font-size: 1.5rem; color: var(--text-secondary);">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form method="POST" action="{{ route('api.profile.update-password') }}" id="password-form" data-ticket-api-form>
+            @csrf
+            <div class="form-item-stacked">
+                <label for="current-password">Current password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="current-password" name="password" required placeholder="Your current password">
+                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
+                </div>
+            </div>
+            <div class="form-item-stacked">
+                <label for="new-password">New password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="new-password" name="password" required placeholder="Your new password">
+                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
+                </div>
+            </div>
+            <div class="form-item-stacked">
+                <label for="confirm-password">Confirm password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm-password" name="password" required placeholder="Confirm password">
+                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
+                </div>
+            </div>
+
+            <div class="inline-elements">
+                <button type="button" class="btn btn--outline" onclick="document.getElementById('password-modal').close()">Cancel</button>
+                <button type="submit" id="confirm-action" class="btn btn--danger">Change password</button>
             </div>
         </form>
     </dialog>

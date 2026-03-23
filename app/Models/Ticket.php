@@ -68,16 +68,6 @@ class Ticket extends Model
     }
 
     /**
-     * Relation: Helpers du ticket
-     */
-    public function helpers()
-    {
-        return $this->belongsToMany(User::class, 'ticket_workers')
-                    ->wherePivot('role', 'Helper')
-                    ->withTimestamps();
-    }
-
-    /**
      * Relation: Attachments
      */
     public function attachments()
