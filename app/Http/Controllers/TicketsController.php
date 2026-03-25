@@ -63,9 +63,6 @@ class TicketsController extends Controller
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
             'priority' => 'required|in:High,Medium,Low',
             'type' => 'required|in:Billed,Included',
-            'workers' => 'nullable|array',
-            'workers.*' => 'exists:users,id',
-            'worker_roles' => 'nullable|array',
             'attachments.*' => 'nullable|file|max:65536',
         ]);
 
@@ -74,17 +71,12 @@ class TicketsController extends Controller
 
         $ticket = Ticket::create($validated);
 
-        // Assign the ticket workers
-        if ($request->has('workers')) {
-            foreach ($request->workers as $index => $userId) {
-                $role = $request->worker_roles[$index] ?? '';
-                $ticket->workers()->attach($userId, ['role' => $role]);
-            }
-        }
-
-        // Add the creator as the "Ticket Creator" if not already a worker
+        // Add the creator as the "Ticket Creator"
         if (!$ticket->workers->contains(Auth::id())) {
-            $ticket->workers()->attach(Auth::id(), ['role' => 'Ticket Creator']);
+            $ticket->workers()->attach(Auth::id(), [
+                'role' => 'Ticket Creator',
+                'spent_time' => 0,
+            ]);
         }
 
         // Handle attachments — store with readable name, save full path in DB
