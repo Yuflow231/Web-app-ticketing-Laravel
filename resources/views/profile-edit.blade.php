@@ -192,27 +192,27 @@
             </button>
         </div>
 
-        <form method="POST" action="{{ route('api.profile.update-password') }}" id="password-form" data-ticket-api-form>
+        <form method="POST" action="{{ route('api.profile.update-password') }}" id="password-form">
             @csrf
             <div class="form-item-stacked">
                 <label for="current-password">Current password</label>
                 <div class="password-wrapper">
-                    <input type="password" id="current-password" name="password" required placeholder="Your current password">
-                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
+                    <input type="password" id="current-password" name="current_password" required placeholder="Your current password">
+                    <span id="toggle-password-current" class="toggle-password"><i class="fa-solid fa-eye"></i></span>
                 </div>
             </div>
             <div class="form-item-stacked">
                 <label for="new-password">New password</label>
                 <div class="password-wrapper">
                     <input type="password" id="new-password" name="password" required placeholder="Your new password">
-                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
+                    <span id="toggle-password-new" class="toggle-password"><i class="fa-solid fa-eye"></i></span>
                 </div>
             </div>
             <div class="form-item-stacked">
                 <label for="confirm-password">Confirm password</label>
                 <div class="password-wrapper">
-                    <input type="password" id="confirm-password" name="password" required placeholder="Confirm password">
-                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
+                    <input type="password" id="confirm-password" name="password_confirmation" required placeholder="Confirm password">
+                    <span id="toggle-password-confirm" class="toggle-password"><i class="fa-solid fa-eye"></i></span>
                 </div>
             </div>
 
@@ -312,20 +312,92 @@
             }
         }
 
-        // Toggle password visibility
-        const togglePassword = document.getElementById('toggle-password');
+        /* --------------------------------------
+        *       PASSWORD UPDATE FORM
+        * --------------------------------------*/
 
-        togglePassword.addEventListener('click', function () {
-            // Toggle the type of the field
-            const type = formPass.getAttribute('type') === 'password' ? 'text' : 'password';
-            formPass.setAttribute('type', type);
+        const passwordForm = document.getElementById('password-form');
+        const passwordModal = document.getElementById('password-modal');
 
-            // Toggle the icon
-            const icon = document.getElementById('pass-icon');
+        const passwordCurrent = document.getElementById('current-password');
+        const passwordNew = document.getElementById('new-password');
+        const passwordConfirm = document.getElementById('confirm-password');
 
-            // switch between visual states
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
+
+        const button = document.getElementById('confirm-action');
+
+        button.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(passwordForm);
+            const data = Object.fromEntries(formData.entries());
+
+            if(formVerif()){
+                try {
+                    const response = await fetch(passwordForm.action, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': data._token
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Toast(result.message || 'Password updated!', 'success');
+                        passwordForm.reset();
+                        passwordModal.close();
+                    } else {
+                        // Extract validation errors (422) or logic errors (406)
+                        let errorMsg = result.error || result.message || 'An error occurred';
+                        if (result.errors) {
+                            errorMsg = Object.values(result.errors).flat().join(' ');
+                        }
+                        Toast(errorMsg, 'error');
+                    }
+                } catch (error) {
+                    Toast('Failed to connect to the server.', 'error');
+                }
+            }
+        });
+
+        function formVerif() {
+            let formValidation = true;
+            FormVerifier.resetFormState([passwordCurrent , passwordNew, passwordConfirm]);
+
+            formValidation &= FormVerifier.checkField(passwordCurrent,    passwordCurrent,    [FormVerifier.verifyEmptyness("Please enter your current password")]);
+            formValidation &= FormVerifier.checkField(passwordNew,    passwordNew,    [FormVerifier.verifyEmptyness("Please enter a password"), FormVerifier.verifyLength("Password must be 8 characters long")]);
+            if (passwordNew.value !== passwordConfirm.value){
+                formValidation = false;
+                passwordNew.classList.add("error-field");
+                passwordConfirm.classList.add("error-field");
+                Toast("Password confirmation don't match the new password entered." , "error");
+            }
+            return formValidation;
+        }
+
+        // Select all toggle spans in the document
+        const togglePasswordSpans = document.querySelectorAll('.toggle-password');
+
+        togglePasswordSpans.forEach(span => {
+            span.addEventListener('click', function () {
+                // Find the input field within this specific wrapper
+                // '.previousElementSibling' works because the input is right before the span
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('svg');
+
+                // Toggle the input type
+                const isPassword = input.getAttribute('type') === 'password';
+                input.setAttribute('type', isPassword ? 'text' : 'password');
+
+                // Toggle the icon classes
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            });
         });
     </script>
 @endsection
