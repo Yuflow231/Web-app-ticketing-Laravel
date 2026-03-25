@@ -62,6 +62,7 @@
                         <h3>{{ $project->name }}</h3>
                         <p>Tickets: {{ $project->tickets->count() }} </p>
                         <p>Status:  <span class="badge @php setBadgeColor($project->status) @endphp"> {{ $project->status }} </span></p>
+                        <button type="button" class="btn btn--outline" style="margin-top: 0.5rem;" onclick="location.href = '{{ route('projects.project-details', $project->id) }}'">Quick access</button>
                     </div>
                 @endforeach
             </div>
@@ -95,9 +96,12 @@
                         <td data-label="Priority"><span class="badge @php setBadgeColor($ticket->priority) @endphp">{{$ticket->priority}}</span></td>
                         <td data-label="Assigned">
                             <div class="avatar-line">
-                                @foreach($ticket->workers as $worker)
-                                    <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->first_name. ' ' .$worker->last_name }}" alt="profile-picture" class="profile-pic-mini">
+                                @foreach($ticket->workers->take(3) as $worker)
+                                    <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" title="{{ $worker->full_name }}" alt="profile-picture" class="profile-pic-mini">
                                 @endforeach
+                                @if($ticket->workers->count() > 3)
+                                    <span class="profile-pic-more" title="{{ $ticket->workers->count() - 3 }} more">...</span>
+                                @endif
                             </div>
                         </td>
                         <td data-label="Actions"><a href="{{ route("tickets.ticket-details", $ticket->id) }}" class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>

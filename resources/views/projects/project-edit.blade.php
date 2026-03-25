@@ -105,7 +105,7 @@
 
                         <div class="form-item-stacked">
                             <label>Time Spent</label>
-                            <input type="text" value="{{ $project->spent_time }} hours" disabled style="background: #f3f4f6; cursor: not-allowed;")>
+                            <input type="text" value="{{ $project->spent_time }} hours" disabled style="background: #f3f4f6; cursor: not-allowed;">
                             <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 0.25rem;">
                                 Calculated from tickets
                             </p>
