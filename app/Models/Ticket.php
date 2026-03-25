@@ -52,7 +52,7 @@ class Ticket extends Model
     public function workers()
     {
         return $this->belongsToMany(User::class, 'ticket_workers')
-                    ->withPivot('role')
+                    ->withPivot('role', 'spent_time')
                     ->withTimestamps();
     }
 

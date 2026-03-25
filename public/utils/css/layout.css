@@ -113,6 +113,11 @@ section h2 {
     margin-bottom: var(--spacing-lg);
 }
 
+.time_spent {
+    color: var(--text-secondary);
+    font-weight: bold;
+    font-size: var(--font-size-base);
+}
 /*------------------------------*/
 /* Profile specific */
 .profile-header {

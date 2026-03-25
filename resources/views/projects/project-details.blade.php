@@ -70,14 +70,17 @@
                     <h2>Project Team</h2>
                     <div id="collaborator-list">
                         @foreach($project->teamMembers->take(3) as $member)
-                            <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
-                                <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
-                                <div class="item-stacked" style="margin-left: var(--spacing-sm);">
-                                    <div>
-                                        <span class="username" data-type="full-name">{{ $member->full_name }}</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
+                                    <img src="{{ $member->profile_pic ? Storage::url($member->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic">
+                                    <div class="item-stacked" style="margin-left: var(--spacing-sm);">
+                                        <div>
+                                            <span class="username">{{ $member->full_name }}</span>
+                                        </div>
+                                        <span class="user-role">{{ $member->pivot->role }}</span>
                                     </div>
-                                    <span class="user-role">{{ $member->pivot->role }}</span>
                                 </div>
+                                <span class="time_spent">{{ $project->calculateUserSpentTime($member->id) }} hour(s)</span>
                             </div>
                         @endforeach
 
@@ -172,7 +175,7 @@
                         </li>
                     @else
                         <li>
-                            <p class="file-name">No contract associate</p>
+                            <p class="file-name">No contract associated</p>
                         </li>
                     @endif
 
@@ -207,9 +210,12 @@
                             <div class="modal-list-name">{{ $member->full_name }}</div>
                             <div class="modal-list-subname">{{ $member->email }}</div>
                         </div>
-                        @if($member->isAdmin())
-                            <span class="badge blue">Admin</span>
-                        @endif
+                        <div>
+                            <span class="time_spent">{{ $project->calculateUserSpentTime($member->id) }} hour(s)</span>
+                            @if($member->isAdmin())
+                                <span class="badge blue">Admin</span>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
             </div>

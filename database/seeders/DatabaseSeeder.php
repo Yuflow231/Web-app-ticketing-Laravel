@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Delete all the previously uploaded files
-        $foldersToClean = ['contracts', 'attachments'];
+        $foldersToClean = ['contracts', 'attachments', 'profiles'];
         foreach ($foldersToClean as $folder) {
             if (Storage::disk('public')->exists($folder)) {
                 $files = Storage::disk('public')->files($folder);
@@ -158,15 +158,33 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Attach users to the tickets
-        $ticket1->workers()->attach($users[0]->id, ['role' => 'Ticket Creator']);
-        $ticket1->workers()->attach($users[1]->id, ['role' => 'Helper']);
+        $ticket1->workers()->attach($users[0]->id, [
+            'role' => 'Ticket Creator',
+            'spent_time' => 7.00
+        ]);
+        $ticket1->workers()->attach($users[1]->id, [
+            'role' => 'Helper',
+            'spent_time' => 3.00
+        ]);
 
-        $ticket2->workers()->attach($users[1]->id, ['role' => 'Ticket Creator']);
+        $ticket2->workers()->attach($users[1]->id, [
+            'role' => 'Ticket Creator',
+            'spent_time' => 6.00
+        ]);
 
-        $ticket3->workers()->attach($admin->id, ['role' => 'Ticket Creator']);
-        $ticket3->workers()->attach($users[0]->id, ['role' => 'Helper']);
+        $ticket3->workers()->attach($admin->id, [
+            'role' => 'Ticket Creator',
+            'spent_time' => 0.00
+        ]);
+        $ticket3->workers()->attach($users[0]->id, [
+            'role' => 'Helper',
+            'spent_time' => 0.00
+        ]);
 
-        $ticket4->workers()->attach($users[2]->id, ['role' => 'Ticket Creator']);
+        $ticket4->workers()->attach($users[2]->id, [
+            'role' => 'Ticket Creator',
+            'spent_time' => 8.00
+        ]);
 
         $this->command->info('Database populated successfully !');
         $this->command->info('Admin: admin@example.com / password');

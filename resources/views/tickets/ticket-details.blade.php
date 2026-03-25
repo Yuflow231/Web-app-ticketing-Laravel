@@ -72,14 +72,17 @@
                     <h2>Assigned Collaborators</h2>
                     <div id="collaborator-list">
                         @foreach($ticket->workers->take(3) as $worker)
-                            <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);">
-                                <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
-                                <div class="item-stacked" style="margin-left: var(--spacing-sm);">
-                                    <div>
-                                        <span class="username" data-type="full-name">{{ $worker->full_name }}</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="user-profile-inline" style="margin-bottom: var(--spacing-sm);" >
+                                    <img src="{{ !empty($worker->profile_pic) ? Storage::url($worker->profile_pic) : asset('assets/images/icon.png') }}" alt="User Profile" class="profile-pic" >
+                                    <div class="item-stacked" style="margin-left: var(--spacing-sm);">
+                                        <div>
+                                            <span class="username">{{ $worker->full_name }}</span>
+                                        </div>
+                                        <span class="user-role">{{ $worker->pivot->role ? $worker->pivot->role : "No role" }}</span>
                                     </div>
-                                    <span class="user-role">{{ $worker->pivot->role ? $worker->pivot->role : "No role" }}</span>
                                 </div>
+                                <span class="time_spent">{{ $worker->pivot->spent_time }} hour(s)</span>
                             </div>
                         @endforeach
                         @if($ticket->workers->count() > 3)
@@ -145,9 +148,12 @@
                             <div class="modal-list-name">{{ $member->full_name }}</div>
                             <div class="modal-list-subname">{{ $member->pivot->role ? $member->pivot->role : "No role assigned" }}</div>
                         </div>
-                        @if($member->isAdmin())
-                            <span class="badge blue">Admin</span>
-                        @endif
+                        <div>
+                            <span class="time_spent">{{ $member->pivot->spent_time }} hour(s)</span>
+                            @if($member->isAdmin())
+                                <span class="badge blue">Admin</span>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
             </div>

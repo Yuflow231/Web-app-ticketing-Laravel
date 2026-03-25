@@ -142,6 +142,8 @@ class ProjectsController extends Controller
     {
         $users = User::all();
 
+        $currentUser = Auth::user();
+
         $project = Project::with('teamMembers')->find($id);
         if (!$project) {
             return redirect()->route('projects.projects')
@@ -156,8 +158,12 @@ class ProjectsController extends Controller
                 ->with('error', 'You are not allowed to access this project.');
         }
 
+        // get the authenticated user with the ticket relation if not an admin
+        if ($isMember) {
+            $currentUser = $project->teamMembers->find($currentUser->id);
+        }
 
-        return view('projects.project-edit', compact('project', 'users'));
+        return view('projects.project-edit', compact('project', 'users', 'currentUser'));
     }
 
     /**
@@ -171,7 +177,7 @@ class ProjectsController extends Controller
             'name' => 'required|string|max:150',
             'description' => 'nullable|string',
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
-            'estimated_time' => 'nullable|numeric|min:0',
+            'closing_date' => 'nullable|date|after_or_equal:today',
             'contract' => 'nullable|file|max:10240',
             'remove_contract' => 'nullable|boolean',
             'team_members' => 'nullable|array',
