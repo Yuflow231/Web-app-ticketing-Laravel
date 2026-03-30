@@ -5,6 +5,7 @@
 @endsection
 
 @section('resources')
+    <script src="{{ asset("utils/js/password-toggle.js") }}" defer></script>
 @endsection
 
 @section('content')
@@ -55,9 +56,7 @@
                 <label for="form-password">Password</label>
                 <div class="password-wrapper">
                     <input type="password" id="form-password" name="password" placeholder="Password" required class="@error('password') input-error @enderror">
-                    <span id="toggle-password" class="toggle-password">
-                        <i id="pass-icon" class="fa-solid fa-eye"></i>
-                    </span>
+                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
                 </div>
                 @error('password')
                 <span class="error-message" style="color: #dc2626; font-size: 0.875rem; margin-top: 4px; display: block;">
@@ -127,29 +126,12 @@
             if(formValidation){
                 canPress = false;
 
-                // Afficher un message de chargement
+                // Show a loading message
                 formButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
                 formButton.disabled = true;
 
-                // Soumettre le formulaire Laravel
                 loginForm.submit();
             }
         }
-
-        // Toggle password visibility
-        const togglePassword = document.getElementById('toggle-password');
-
-        togglePassword.addEventListener('click', function () {
-            // Toggle the type of the field
-            const type = formPass.getAttribute('type') === 'password' ? 'text' : 'password';
-            formPass.setAttribute('type', type);
-
-            // Toggle the icon
-            const icon = document.getElementById('pass-icon');
-
-            // switch between visual states
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        });
     </script>
 @endsection
