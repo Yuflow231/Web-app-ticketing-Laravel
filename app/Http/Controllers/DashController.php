@@ -16,8 +16,8 @@ class DashController extends Controller
         $user = Auth::user();
 
         // Base queries
-        $projectsQuery = Project::query();
-        $ticketsQuery = Ticket::query();
+        $projectsQuery = Project::with(['teamMembers', 'tickets']);
+        $ticketsQuery = Ticket::with('workers');
 
         // Restrict for non-admin users (same logic as list pages)
         if (!$user->isAdmin()) {
