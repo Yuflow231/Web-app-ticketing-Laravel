@@ -233,7 +233,7 @@
                         <p style="margin-bottom: 1rem; font-size: var(--font-size-sm);">
                             Once you delete your ticket, there is no going back. Please be certain.
                         </p>
-                        <button type="button" class="btn btn--danger" onclick="document.getElementById('delete-modal').showModal()">
+                        <button type="button" class="btn btn--danger" @disabled(!$hasPerms) onclick="document.getElementById('delete-modal').showModal()">
                             <i class="fa-solid fa-trash"></i>
                             Delete Ticket
                         </button>
