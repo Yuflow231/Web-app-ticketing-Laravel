@@ -87,7 +87,7 @@
                     <tbody>
                     <!-- Tickets will be loaded here -->
                     <!-- Ticket template -->
-                    @foreach($tickets->items() as $ticket)
+                    @foreach($tickets as $ticket)
                     <tr>
                         <td data-label="ID">#{{ $ticket->id }}</td>
                         <td data-label="Title" class="text-cell"><strong>{{ $ticket->name }}</strong></td>

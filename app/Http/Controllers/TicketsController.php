@@ -26,7 +26,7 @@ class TicketsController extends Controller
             $query->whereRelation('workers', 'users.id', $user->id);
         }
 
-        $tickets = $query->latest()->paginate(15);
+        $tickets = $query->latest()->get();
 
         return view('tickets.tickets', compact('tickets'));
     }

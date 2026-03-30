@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class DashController extends Controller
 {
     /**
-     * Afficher le dashboard
+     * Show dashboard
      */
     public function index()
     {

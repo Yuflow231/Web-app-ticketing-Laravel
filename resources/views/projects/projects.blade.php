@@ -66,7 +66,7 @@
                     <tbody>
                     <!-- Projects will be loaded here -->
                     <!-- Project template -->
-                    @foreach($projects->items() as $project)
+                    @foreach($projects as $project)
                         @php $owner = $project->owner->first(); @endphp
                         <tr>
                             <td data-label="ID">#{{ $project->id }}</td>

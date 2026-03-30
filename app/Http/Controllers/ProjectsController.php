@@ -24,7 +24,7 @@ class ProjectsController extends Controller
             $query->whereRelation('teamMembers', 'users.id', $user->id);
         }
 
-        $projects = $query->latest()->paginate(15);
+        $projects = $query->latest()->get();
 
         return view('projects.projects', compact('projects'));
     }
