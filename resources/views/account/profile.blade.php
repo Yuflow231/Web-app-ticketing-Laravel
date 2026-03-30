@@ -126,7 +126,7 @@
 
 @section('js_page')
     <script type="module">
-        import * as FormVerifier from "{{ asset("utils/js/form-verifs.js") }}";
+        import * as FormVerifier from "{{ asset('utils/js/form-verifs.js') }}";
         import Toast from "{{ asset('utils/js/toast.js') }}";
 
         const passwordForm = document.getElementById('password-form');

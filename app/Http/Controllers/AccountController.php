@@ -16,7 +16,7 @@ class AccountController extends Controller
      */
     public function showLogin()
     {
-        return view('login');
+        return view('account.login');
     }
 
     /**
@@ -62,7 +62,7 @@ class AccountController extends Controller
      */
     public function showRegister()
     {
-        return view('create-account');
+        return view('account.create-account');
     }
 
     /**
@@ -98,7 +98,7 @@ class AccountController extends Controller
      */
     public function showProfile()
     {
-        return view('profile', [
+        return view('account.profile', [
             'user' => Auth::user()
         ]);
     }
@@ -108,7 +108,7 @@ class AccountController extends Controller
      */
     public function editProfile()
     {
-        return view('profile-edit', [
+        return view('account.profile-edit', [
             'user' => Auth::user()
         ]);
     }

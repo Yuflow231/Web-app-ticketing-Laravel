@@ -71,7 +71,7 @@
 
 @section('js_page')
     <script type="module">
-        import * as FormVerifier from "{{ asset("utils/js/form-verifs.js") }}";
+        import * as FormVerifier from "{{ asset('utils/js/form-verifs.js') }}";
 
         let formFirst   = document.getElementById("form-first");
         let formLast    = document.getElementById("form-last");
