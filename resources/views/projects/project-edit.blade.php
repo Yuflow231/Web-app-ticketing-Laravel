@@ -11,6 +11,11 @@
 
 @section('content')
     @include('layout.nav')
+
+    @php
+        $hasPerms = $currentUser->hasProjectRole($project->id, ['Owner']) || $currentUser->isAdmin()
+    @endphp
+
     <!-- Main Content -->
     <main class="main-content">
         <header class="page-header">
@@ -81,18 +86,14 @@
                         <div class="form-item-stacked">
                             <label for="closing-date">Closing Date</label>
                             <input type="date" id="closing-date" name="closing_date"
-                                   value="{{ old('closing_date', optional($project->closing_date)->format('Y-m-d')) }}">
+                                   value="{{ old('closing_date', optional($project->closing_date)->format('Y-m-d')) }}" @disabled(!$hasPerms)>
                         </div>
 
                         <div class="form-item-stacked">
                             <label for="estimated-time">Estimated Time</label>
                             <input type="number" id="estimated-time" name="estimated_time"
-                                value="{{ old('estimated_time', $project->estimated_time) }}" placeholder="0" min="0" step="1">
+                                value="{{ old('estimated_time', $project->estimated_time) }}" placeholder="0" min="0" step="1" @disabled(!$hasPerms)>
                         </div>
-                    </div>
-
-                    {{-- Progress and Estimated Time --}}
-                    <div class="form-2elements">
                     </div>
 
                     {{-- Read-only fields --}}
@@ -185,7 +186,7 @@
                 <section class="detail-card full-width">
                     <h2>Project Team</h2>
 
-                    <div id="selected-team" class="team-selector" style="padding: var(--spacing-sm); border: 1px solid #ddd; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s; min-height: 100px;" onclick="document.getElementById('team-modal').showModal()">
+                    <div id="selected-team" class="team-selector" style="padding: var(--spacing-sm); border: 1px solid #ddd; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s; min-height: 100px;" @if($hasPerms) onclick="document.getElementById('team-modal').showModal()" @endif>
                         <div id="team-members-display">
                             @if($project->teamMembers->count() > 0)
                                 @foreach($project->teamMembers as $member)
@@ -205,8 +206,12 @@
                             @endif
                         </div>
                         <div style="text-align: center; margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid #eee;">
-                            <i class="fa-solid fa-user-plus" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
-                            <span style="color: var(--primary-color); font-weight: 600;">Click to manage team</span>
+                            @if($hasPerms)
+                                <i class="fa-solid fa-user-plus" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+                                <span style="color: var(--primary-color); font-weight: bold;">Click to manage team</span>
+                            @else
+                                <span style="color: var(--text-secondary); font-weight: bold;">Your current role doesn't allow you to manage the project's team</span>
+                            @endif
                         </div>
                     </div>
 
@@ -224,7 +229,7 @@
                         <p style="margin-bottom: 1rem; font-size: var(--font-size-sm);">
                             Once you delete your project, there is no going back. Please be certain.
                         </p>
-                        <button type="button" class="btn btn--danger" onclick="document.getElementById('delete-modal').showModal()">
+                        <button type="button" class="btn btn--danger" @disabled(!$hasPerms) onclick="document.getElementById('delete-modal').showModal()">
                             <i class="fa-solid fa-trash"></i>
                             Delete Project
                         </button>

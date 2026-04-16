@@ -52,7 +52,7 @@ class Ticket extends Model
     public function workers()
     {
         return $this->belongsToMany(User::class, 'ticket_workers')
-                    ->withPivot('role')
+                    ->withPivot('role', 'spent_time')
                     ->withTimestamps();
     }
 
@@ -65,16 +65,6 @@ class Ticket extends Model
                     ->wherePivot('role', 'Ticket Creator')
                     ->withTimestamps()
                     ->first();
-    }
-
-    /**
-     * Relation: Helpers du ticket
-     */
-    public function helpers()
-    {
-        return $this->belongsToMany(User::class, 'ticket_workers')
-                    ->wherePivot('role', 'Helper')
-                    ->withTimestamps();
     }
 
     /**

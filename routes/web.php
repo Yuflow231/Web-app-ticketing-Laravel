@@ -31,7 +31,6 @@ Route::get('/reset-password', [AccountController::class, 'password'])->name('res
 */
 
 Route::middleware('auth')->group(function () {
-
     // Log out
     Route::post('/logout', [AccountController::class, 'logout'])->name('logout');
 

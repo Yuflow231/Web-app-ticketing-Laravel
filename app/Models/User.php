@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Models\Project;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -67,13 +68,61 @@ class User extends Authenticatable
     }
 
     /**
+     * Check whether the user has one of the given roles in a specific project.
+     */
+    public function hasProjectRole(int $projectId, string|array $roles): bool
+    {
+        $roles = is_array($roles) ? $roles : [$roles];
+
+        return $this->projects()
+            ->where('projects.id', $projectId)
+            ->wherePivotIn('role', $roles)
+            ->exists();
+    }
+
+    /**
+     * Check whether the user is part of a project team.
+     */
+    public function isInProjectTeam(int $projectId): bool
+    {
+        return $this->projects()
+            ->where('projects.id', $projectId)
+            ->exists();
+    }
+
+
+
+    /**
      * Relation: Tickets where the user os assigned to
      */
     public function tickets()
     {
         return $this->belongsToMany(Ticket::class, 'ticket_workers')
-                    ->withPivot('role')
+                    ->withPivot('role', 'spent_time')
                     ->withTimestamps();
+    }
+
+    /**
+     * Check whether the user is part of a ticket team.
+     */
+    public function isInTicketTeam(int $ticketId): bool
+    {
+        return $this->tickets()
+            ->where('tickets.id', $ticketId)
+            ->exists();
+    }
+
+    /**
+     * Check whether the user has one of the given roles in a specific ticket.
+     */
+    public function hasTicketRole(int $ticketId, string|array $roles): bool
+    {
+        $roles = is_array($roles) ? $roles : [$roles];
+
+        return $this->tickets()
+            ->where('tickets.id', $ticketId)
+            ->wherePivotIn('role', $roles)
+            ->exists();
     }
 
     /**

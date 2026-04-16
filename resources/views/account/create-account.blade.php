@@ -5,6 +5,7 @@
 @endsection
 
 @section('resources')
+    <script src="{{ asset("utils/js/password-toggle.js") }}" defer></script>
 @endsection
 
 @section('content')
@@ -45,9 +46,7 @@
                 <label for="form-pass">Password</label>
                 <div class="password-wrapper">
                     <input type="password" id="form-pass" name="password" placeholder="Password">
-                    <span id="toggle-password" class="toggle-password">
-                    <i id="pass-icon" class="fa-solid fa-eye"></i>
-                </span>
+                    <span id="toggle-password" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
                 </div>
             </div>
 
@@ -55,6 +54,7 @@
                 <label for="form-pass-confirm">Confirm Password</label>
                 <div class="password-wrapper">
                     <input type="password" id="form-pass-confirm" name="password_confirmation" placeholder="Confirm Password">
+                    <span id="toggle-confirm-pass" class="toggle-password"><i id="pass-icon" class="fa-solid fa-eye"></i></span>
                 </div>
             </div>
 
@@ -71,7 +71,7 @@
 
 @section('js_page')
     <script type="module">
-        import * as FormVerifier from "{{ asset("utils/js/form-verifs.js") }}";
+        import * as FormVerifier from "{{ asset('utils/js/form-verifs.js') }}";
 
         let formFirst   = document.getElementById("form-first");
         let formLast    = document.getElementById("form-last");
@@ -109,14 +109,5 @@
                 document.getElementById("creation-form").submit();
             }
         }
-
-        const togglePassword = document.getElementById('toggle-password');
-        togglePassword.addEventListener('click', function () {
-            const type = formPass.getAttribute('type') === 'password' ? 'text' : 'password';
-            formPass.setAttribute('type', type);
-            const icon = document.getElementById('pass-icon');
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        });
     </script>
 @endsection

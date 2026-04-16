@@ -119,6 +119,17 @@ class Project extends Model
         $this->save();
     }
 
+    /**
+     * Get total time spent by a specific user across this project's tickets.
+     */
+    public function calculateUserSpentTime(int $userId)
+    {
+        return $this->tickets()
+            ->join('ticket_workers', 'tickets.id', '=', 'ticket_workers.ticket_id')
+            ->where('ticket_workers.user_id', $userId)
+            ->sum('ticket_workers.spent_time');
+    }
+
 
     /**
      * Scope for active projects

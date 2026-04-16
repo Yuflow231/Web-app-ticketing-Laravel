@@ -22,13 +22,11 @@ class TicketsController extends Controller
 
         $query = Ticket::with(['project', 'workers']);
 
-        if (!$user || !$user->isAdmin()) {
-            $query->whereHas('workers', function ($q) use ($user) {
-                $q->where('users.id', $user?->id);
-            });
+        if (!$user->isAdmin()) {
+            $query->whereRelation('workers', 'users.id', $user->id);
         }
 
-        $tickets = $query->latest()->paginate(15);
+        $tickets = $query->latest()->get();
 
         return view('tickets.tickets', compact('tickets'));
     }
@@ -65,9 +63,6 @@ class TicketsController extends Controller
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
             'priority' => 'required|in:High,Medium,Low',
             'type' => 'required|in:Billed,Included',
-            'workers' => 'nullable|array',
-            'workers.*' => 'exists:users,id',
-            'worker_roles' => 'nullable|array',
             'attachments.*' => 'nullable|file|max:65536',
         ]);
 
@@ -76,17 +71,12 @@ class TicketsController extends Controller
 
         $ticket = Ticket::create($validated);
 
-        // Assign the ticket workers
-        if ($request->has('workers')) {
-            foreach ($request->workers as $index => $userId) {
-                $role = $request->worker_roles[$index] ?? '';
-                $ticket->workers()->attach($userId, ['role' => $role]);
-            }
-        }
-
-        // Add the creator as the "Ticket Creator" if not already a worker
+        // Add the creator as the "Ticket Creator"
         if (!$ticket->workers->contains(Auth::id())) {
-            $ticket->workers()->attach(Auth::id(), ['role' => 'Ticket Creator']);
+            $ticket->workers()->attach(Auth::id(), [
+                'role' => 'Ticket Creator',
+                'spent_time' => 0,
+            ]);
         }
 
         // Handle attachments — store with readable name, save full path in DB
@@ -130,26 +120,18 @@ class TicketsController extends Controller
     {
         $user = Auth::user();
 
-        // Fail-safe: unauthenticated user
-        if (!$user) {
-            return redirect()->route('login')
-                ->with('info', 'Please sign in to access ticket details.');
-        }
-
         $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
-
-        // Fail-safe: ticket deleted or invalid id
         if (!$ticket) {
             return redirect()->route('tickets.tickets')
                 ->with('info', 'Ticket not found or no longer exists.');
         }
 
-        $isMember = $ticket->project->teamMembers()->where('users.id', $user->id)->exists();
+        $isMember = $ticket->workers()->where('users.id', $user->id)->exists();
         $isAdmin = $user->isAdmin();
 
-        if (!$isMember && !$isAdmin) {
+        if ( !$isMember && !$isAdmin ) {
             return redirect()->route('tickets.tickets')
-                ->with('info', 'Access denied.');
+                ->with('error', 'Access denied.');
         }
 
         return view('tickets.ticket-details', compact('ticket'));
@@ -160,19 +142,36 @@ class TicketsController extends Controller
      */
     public function showEdit(int $id)
     {
-        $projects = Project::all();
-        $users = User::all();
-        $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
+        $user = Auth::user();
 
-        return view('tickets.ticket-edit', compact('ticket', 'projects', 'users'));
+        $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
+        if (!$ticket) {
+            return redirect()->route('tickets.tickets')
+                ->with('info', 'Ticket not found or no longer exists.');
+        }
+
+        $isMember = $ticket->workers()->where('users.id', $user->id)->exists();
+        $isAdmin = $user->isAdmin();
+
+        if ( !$isMember && !$isAdmin ) {
+            return redirect()->route('tickets.tickets')
+                ->with('error', 'Access denied.');
+        }
+
+        // get the authenticated user with the ticket relation if not an admin
+        if ($isMember) {
+            $user = $ticket->workers->find($user->id);
+        }
+
+        return view('tickets.ticket-edit', compact('ticket', 'user'));
     }
 
     /**
      * Update the ticket
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $ticketId)
     {
-        $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($id);
+        $ticket = Ticket::with(['project.teamMembers', 'workers', 'attachments'])->find($ticketId);
 
         $validated = $request->validate([
             'name' => 'required|string|max:150',
@@ -182,27 +181,48 @@ class TicketsController extends Controller
             'priority' => 'required|in:High,Medium,Low',
             'type' => 'required|in:Billed,Included',
             'estimated_time' => 'nullable|numeric|min:0',
-            'spent_time' => 'required|numeric|min:0',
+            'user_spent_time' => 'numeric|min:0',
             'workers' => 'nullable|array',
             'workers.*' => 'exists:users,id',
             'worker_roles' => 'nullable|array',
             'attachments.*' => 'nullable|file|max:65536',
         ]);
 
+        // Extract the user spent time so we can apply it to the pivot table later
+        $userSpentTime = $request->input('user_spent_time');
+        unset($validated['user_spent_time']);
+
         $ticket->update($validated);
 
-        // Update the workers
+        // Update the workers and their pivot data
         if ($request->has('workers') && is_array($request->workers) && count($request->workers) > 0) {
             $syncData = [];
+            // Fetch existing pivot data so we don't wipe out other users' tracked time
+            $existingWorkers = $ticket->workers->pluck('pivot.spent_time', 'id')->toArray();
+
             foreach ($request->workers as $index => $userId) {
                 $role = $request->worker_roles[$index] ?? '';
-                $syncData[$userId] = ['role' => $role];
+                // Keep the existing spent_time, or default to 0 if it's a new worker
+                $spentTime = $existingWorkers[$userId] ?? 0;
+                // If the looped worker is the currently authenticated user, update THEIR time
+                if ($userId == Auth::id() && $userSpentTime !== null) {
+                    $spentTime = $userSpentTime;
+                }
+                $syncData[$userId] = [
+                    'role' => $role,
+                    'spent_time' => $spentTime
+                ];
             }
             $ticket->workers()->sync($syncData);
         } else {
             // Detach all workers if none selected
             $ticket->workers()->detach();
         }
+
+        // Update the overall ticket spent_time based on the sum of all users
+        $ticket->spent_time = $ticket->workers()->sum('ticket_workers.spent_time');
+        $ticket->save();
+
 
         // Delete marked attachments
         if ($request->has('delete_attachments') && is_array($request->delete_attachments)) {
@@ -261,6 +281,7 @@ class TicketsController extends Controller
     public function destroy(int $id)
     {
         $ticket = Ticket::findOrFail($id);
+        $project = $ticket->project;
 
         foreach ($ticket->attachments as $attachment) {
             Storage::disk('public')->delete($attachment->file_name);
@@ -268,6 +289,11 @@ class TicketsController extends Controller
         }
 
         $ticket->delete();
+
+        // CRITICAL: Update parent project's times based on ALL tickets
+        $project->calculateSpentTime();
+        $project->calculateEstimatedTime();
+        $project->calculatePercent();
 
         return redirect()->route('tickets.tickets')
             ->with('success', 'Ticket deleted successfully.');

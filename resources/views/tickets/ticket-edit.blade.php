@@ -12,6 +12,9 @@
 @section('content')
     @include('layout.nav')
 
+    @php
+        $hasPerms = $user->hasTicketRole($ticket->id, ['Ticket Creator', 'Tester']) || $user->isAdmin()
+    @endphp
     <!-- Main Content -->
     <main class="main-content">
         <header class="page-header">
@@ -34,7 +37,7 @@
             </div>
         @endif
 
-        <form id="ticket-form" method="POST" action="{{ route('tickets.ticket-update', $ticket->id ) }}" enctype="multipart/form-data">
+        <form id="ticket-form" method="POST" action="{{ route('tickets.ticket-update', $ticket->id) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -81,8 +84,9 @@
                     {{-- Time Fields --}}
                     <div class="form-2elements">
                         <div class="form-item-stacked">
-                            <label for="spent-time">Time Spent</label>
-                            <input type="number" id="spent-time" name="spent_time" value="{{ old('spent_time', $ticket->spent_time) }}" placeholder="0" min="0" step="1" required>
+                            <label for="spent-time">Your Time Spent</label>
+                            <input type="number" id="spent-time" name="user_spent_time" value="{{ old('user_spent_time', $user?->pivot?->spent_time ?? 0) }}" placeholder="0" min="0" step="1" required
+                            @disabled(!$user->isInTicketTeam($ticket->id))>
                             <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 0.25rem;">
                                 Updates parent project's spent time
                             </p>
@@ -90,7 +94,8 @@
 
                         <div class="form-item-stacked">
                             <label for="estimated-time">Estimated Time</label>
-                            <input type="number" id="estimated-time" name="estimated_time" value="{{ old('estimated_time', $ticket->estimated_time) }}" placeholder="0" min="0" step="1">
+                            <input type="number" id="estimated-time" name="estimated_time" value="{{ old('estimated_time', $ticket->estimated_time) }}" placeholder="0" min="0" step="1"
+                                @disabled(!$hasPerms)>
                             <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 0.25rem;">
                                 Updates parent project's estimated time
                             </p>
@@ -183,7 +188,7 @@
                 <section class="detail-card full-width">
                     <h2>Assigned Workers</h2>
 
-                    <div id="selected-workers" class="workers-selector" style="padding: var(--spacing-sm); border: 1px solid #ddd; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s; min-height: 100px;" onclick="document.getElementById('workers-modal').showModal()">
+                    <div id="selected-workers" class="workers-selector" style="padding: var(--spacing-sm); border: 1px solid #ddd; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s; min-height: 100px;" @if($hasPerms) onclick="document.getElementById('workers-modal').showModal()" @endif>
                         <div id="workers-display">
                             @if($ticket->workers->count() > 0)
                                 @foreach($ticket->workers as $worker)
@@ -203,8 +208,14 @@
                             @endif
                         </div>
                         <div style="text-align: center; margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid #eee;">
-                            <i class="fa-solid fa-user-plus" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
-                            <span style="color: var(--primary-color); font-weight: 600;">Click to manage workers</span>
+
+
+                            @if($hasPerms)
+                                <i class="fa-solid fa-user-plus" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+                                <span style="color: var(--primary-color); font-weight: bold;">Click to manage workers</span>
+                            @else
+                                <span style="color: var(--text-secondary); font-weight: bold;">Your current role doesn't allow you to manage the ticket's workers</span>
+                            @endif
                         </div>
                     </div>
 
@@ -222,7 +233,7 @@
                         <p style="margin-bottom: 1rem; font-size: var(--font-size-sm);">
                             Once you delete your ticket, there is no going back. Please be certain.
                         </p>
-                        <button type="button" class="btn btn--danger" onclick="document.getElementById('delete-modal').showModal()">
+                        <button type="button" class="btn btn--danger" @disabled(!$hasPerms) onclick="document.getElementById('delete-modal').showModal()">
                             <i class="fa-solid fa-trash"></i>
                             Delete Ticket
                         </button>

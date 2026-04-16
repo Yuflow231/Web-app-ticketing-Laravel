@@ -20,13 +20,11 @@ class ProjectsController extends Controller
 
         $query = Project::with(['teamMembers', 'tickets', 'owner']);
 
-        if (!$user || !$user->isAdmin()) {
-            $query->whereHas('teamMembers', function ($q) use ($user) {
-                $q->where('users.id', $user?->id);
-            });
+        if (!$user->isAdmin()) {
+            $query->whereRelation('teamMembers', 'users.id', $user->id);
         }
 
-        $projects = $query->latest()->paginate(15);
+        $projects = $query->latest()->get();
 
         return view('projects.projects', compact('projects'));
     }
@@ -144,14 +142,28 @@ class ProjectsController extends Controller
     {
         $users = User::all();
 
+        $currentUser = Auth::user();
+
         $project = Project::with('teamMembers')->find($id);
         if (!$project) {
             return redirect()->route('projects.projects')
                 ->with('info', 'Project not found or no longer exists.');
         }
 
+        $isMember = $project->teamMembers()->where('users.id', Auth::user()->id)->exists();
+        $isAdmin = Auth::user()->isAdmin();
 
-        return view('projects.project-edit', compact('project', 'users'));
+        if ( !$isMember && !$isAdmin ) {
+            return redirect()->route('projects.projects')
+                ->with('error', 'You are not allowed to access this project.');
+        }
+
+        // get the authenticated user with the ticket relation if not an admin
+        if ($isMember) {
+            $currentUser = $project->teamMembers->find($currentUser->id);
+        }
+
+        return view('projects.project-edit', compact('project', 'users', 'currentUser'));
     }
 
     /**
@@ -165,7 +177,7 @@ class ProjectsController extends Controller
             'name' => 'required|string|max:150',
             'description' => 'nullable|string',
             'status' => 'required|in:New,In Progress,On Hold,Completed,Closed',
-            'estimated_time' => 'nullable|numeric|min:0',
+            'closing_date' => 'nullable|date|after_or_equal:today',
             'contract' => 'nullable|file|max:10240',
             'remove_contract' => 'nullable|boolean',
             'team_members' => 'nullable|array',

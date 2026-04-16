@@ -16,7 +16,7 @@ class AccountController extends Controller
      */
     public function showLogin()
     {
-        return view('login');
+        return view('account.login');
     }
 
     /**
@@ -62,7 +62,7 @@ class AccountController extends Controller
      */
     public function showRegister()
     {
-        return view('create-account');
+        return view('account.create-account');
     }
 
     /**
@@ -98,7 +98,7 @@ class AccountController extends Controller
      */
     public function showProfile()
     {
-        return view('profile', [
+        return view('account.profile', [
             'user' => Auth::user()
         ]);
     }
@@ -108,7 +108,7 @@ class AccountController extends Controller
      */
     public function editProfile()
     {
-        return view('profile-edit', [
+        return view('account.profile-edit', [
             'user' => Auth::user()
         ]);
     }
@@ -172,7 +172,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Update password
+     * Update password through API
      */
     public function updatePassword(Request $request)
     {
@@ -184,14 +184,14 @@ class AccountController extends Controller
         $user = Auth::user();
 
         if (!Hash::check($validated['current_password'], $user->password_hashed)) {
-            return back()->withErrors(['current_password' => 'Incorrect password']);
+            return response()->json([
+                'error' => 'Current password is incorrect.',
+            ], 406);
         }
 
-        $user->update([
-            'password_hashed' => Hash::make($validated['password'])
-        ]);
+        $user->update(['password_hashed' => Hash::make($validated['password'])]);
 
-        return back()->with('success', 'Password updated successfully');
+        return response()->json(['message' => 'Password updated successfully!',]);
     }
 
     /**
